@@ -17,6 +17,7 @@ $(document).ready(function() {
 }	
 	//location of data files
 	var data_base_folder = location.href + 'ansys-data/';
+	console.log(data_base_folder);
 	var data_sub_folder = getParameterByName('name');
 	$("h2#title").html('Folder: ' + data_sub_folder);
 	var data_files = [];
