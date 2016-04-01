@@ -1,0 +1,70 @@
+<html>
+	<head>
+		<title>B. Komen - Homepage</title>
+	</head>
+	<body>
+	<div class="main">
+		<p>For my Master's thesis, several graphs can be viewed. In the links, "v" means train velocity [km/h] and "ne" means the amount of elements between hangers.</p>
+
+		<h2>1 - Beam with one sprung mass</h2>
+		<p>Simply supported beam on which one sprung mass moves. Length is 25 meters, mass is 5750 kg, velocity is 100 km/h.
+		The Ansys results are compared to an analytical-numerical solution from Matlab.
+			<ul>
+				<li><a href="http://homepage.tudelft.nl/u04r0/thesis/compare.html?ansys=vel_100_nv_1&matlab=vel_100_nv_1_ne_250">v = 100, nv = 1</a></li>
+				<ul>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/fft.html?folder=vel_100_nv_1_ne_250&file=0">bridge displ fft</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/fft.html?folder=vel_100_nv_1_ne_250&file=1">bogie displ fft</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/fft.html?folder=vel_100_nv_1_ne_250&file=3">bogie accel fft</a></li>
+				</ul>
+			</ul>
+		</p>
+		
+		<h2>2 - Beam with multiple sprung masses</h2>
+			<p>2 SDOF sprung masses, moving over a 75 meter long simply supported beam.
+				<ul>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_100_nv_2">v = 100, nv = 2</a></li>
+				</ul>
+			</p>
+		<h2>4 - 2D Arch bridge with multiple sprung masses</h2>
+			<h3>Convergence study</h3>
+			<p>6 SDOF sprung masses, moving over a 2D tied-arch bridge.
+				<ul>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_ne_1">v = 160, ne = 1</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_ne_10">v = 160, ne = 10</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_ne_20">v = 160, ne = 20</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_ne_30">v = 160, ne = 30</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_ne_40">v = 160, ne = 40</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_ne_50">v = 160, ne = 50</a></li>
+				</ul>
+			</p>
+			
+			<h3>Number of bogies</h3>
+			<p>Setting the number of bogies to 12 (which means six coaches, the longer VIRM version).
+				<ul>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_nv_1">v = 160, nv = 1</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_nv_1_alt">v = 160, nv = 1 (direct get functions)</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_nv_2">v = 160, nv = 2</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=vel_160_nv_12">v = 160, nv = 12</a></li>
+				</ul>
+			</p>
+		<h2>5 - 3D Arch bridge with multiple sprung masses</h2>
+			<p>Now the bridge model is made 3D, still the same 12 bogies run over it.</p>
+				<ul>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/ansys.html?name=bridge_3d_vel_100_nv_12">bridge = 3d, v = 100, nv = 12</a></li>
+				</ul>
+		<h2>6 - Measurements graphs</h2>
+			<p>On March 24, 2016 several trips between Utrecht and 's-Hertogenbosch were made and acceleration measurements were taken.<p>
+			<h3>Full data</h3>
+				<ul>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/experiment.html">all 8 full trips</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/experiment_bridge_only.html">bridge parts only</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/experiment_bridge_fft.html">bridge parts fft</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/experiment_nonbridge_fft.html?name=trip_2_alt">trip 2 (non bridge)</a></li>
+					<li><a href="http://homepage.tudelft.nl/u04r0/thesis/experiment_nonbridge_fft.html?name=trip_4_alt">trip 4 (non bridge)</a></li>
+				</ul>
+	</div>
+	<div class="footer" style="height: 50px;">
+		<span style="font-size: smaller;">Last updated: April 1, 2016</span>
+	</div>
+	</body>
+</html>
