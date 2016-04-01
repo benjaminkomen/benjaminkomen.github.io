@@ -17,14 +17,13 @@ $(document).ready(function() {
 }	
 	//location of data files
 	var data_base_folder = window.location.host + '/graphs/ansys-data/';
-	console.log(data_base_folder);
 	var data_sub_folder = getParameterByName('name');
 	$("h2#title").html('Folder: ' + data_sub_folder);
 	var data_files = [];
 	for (i=0;i<4;i++) {
 		data_files.push(data_base_folder + data_sub_folder + '/' + i + '.txt');
 	}
-	
+	console.log(data_files);
 	//loop through data files and preprocess data to plot graph
 	$.each(data_files, function(fileNo, data_file) {
 		var options = 'options' + fileNo;
