@@ -23,7 +23,7 @@ $(document).ready(function() {
 	for (i=0;i<4;i++) {
 		data_files.push(data_base_folder + data_sub_folder + '/' + i + '.txt');
 	}
-	console.log(data_files);
+	
 	//loop through data files and preprocess data to plot graph
 	$.each(data_files, function(fileNo, data_file) {
 		var options = 'options' + fileNo;
@@ -70,7 +70,7 @@ $(document).ready(function() {
 			},
 			series : []
 		};
-	
+		console.log(data_file);
 		//Load the data file and add correct data items to array
 		$.get(data_file, function(data) {
 			// Split the lines
