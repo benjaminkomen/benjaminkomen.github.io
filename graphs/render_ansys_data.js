@@ -16,7 +16,7 @@ $(document).ready(function() {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }	
 	//location of data files
-	var data_base_folder = 'http://homepage.tudelft.nl/u04r0/thesis/ansys-data/';
+	var data_base_folder = location.href + 'ansys-data/';
 	var data_sub_folder = getParameterByName('name');
 	$("h2#title").html('Folder: ' + data_sub_folder);
 	var data_files = [];
