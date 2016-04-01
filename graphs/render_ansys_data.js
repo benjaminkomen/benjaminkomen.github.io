@@ -1,6 +1,6 @@
 /* Name:			render_ansys_data
  * Date: 			
- * Last modified:	March 28, 2016
+ * Last modified:	April 1, 2016
  * Description:		Make four graphs of ansys output data 0, 1, 2 and 3.txt
  */
 $(document).ready(function() {
