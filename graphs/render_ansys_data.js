@@ -16,7 +16,7 @@ $(document).ready(function() {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }	
 	//location of data files
-	var data_base_folder = window.location.host + 'graphs/ansys-data/';
+	var data_base_folder = window.location.host + '/graphs/ansys-data/';
 	console.log(data_base_folder);
 	var data_sub_folder = getParameterByName('name');
 	$("h2#title").html('Folder: ' + data_sub_folder);
