@@ -17,7 +17,7 @@ $(document).ready(function() {
 }
 	//location of data files
 	var data_sub_folder = getParameterByName('name');
-	var data_base_folder = 'http://homepage.tudelft.nl/u04r0/thesis/experiment-data/';
+	var data_base_folder = 'experiment-data/';
 	$("h2#title").html('Folder: ' + data_sub_folder + ' plot + fast fourier transform');
 	var data_files = [];
 	var graph_name = [data_sub_folder, data_sub_folder + '_fft'];

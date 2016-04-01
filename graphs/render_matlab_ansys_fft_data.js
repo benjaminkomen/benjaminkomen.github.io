@@ -18,7 +18,7 @@ $(document).ready(function() {
 	//location of data files
 	var data_sub_folder = getParameterByName('folder');
 	var data_file_name = getParameterByName('file');
-	var data_base_folder = 'http://homepage.tudelft.nl/u04r0/thesis/matlab-data/';
+	var data_base_folder = 'matlab-data/';
 	$("h2#title").html('Folder: ' + data_sub_folder + ' file: ' + data_file_name + ' time history and fast fourier transform');
 	var data_files1 = [];
 	var data_files2 = [];

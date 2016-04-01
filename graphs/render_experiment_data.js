@@ -19,7 +19,7 @@ $(document).ready(function() {
 	//check if a specific plot is requested
 	if (getParameterByName('name')) {
 		var data_sub_folder = getParameterByName('name');
-		var data_base_folder = 'http://homepage.tudelft.nl/u04r0/thesis/experiment-data/';
+		var data_base_folder = 'experiment-data/';
 		$("h2#title").html('Folder: ' + data_sub_folder);
 		var data_files = [];
 		var graph_name = [data_sub_folder];
@@ -28,7 +28,7 @@ $(document).ready(function() {
 		var end_time = [1000];
 	//if not, show the 8 graphs of the experiment
 	} else { 
-		var data_base_folder = 'http://homepage.tudelft.nl/u04r0/thesis/experiment-data/full/';
+		var data_base_folder = 'experiment-data/full/';
 		$("h2#title").html('Kuilenburgse spoorbrug measurements March 24, 2016');
 		var data_files = [];
 		var graph_name = [];

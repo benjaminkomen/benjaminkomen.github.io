@@ -22,8 +22,8 @@ $(document).ready(function() {
 	};
 
 	//location of data files
-	var ansys_base_folder = 'http://homepage.tudelft.nl/u04r0/thesis/ansys-data/';
-	var matlab_base_folder = 'http://homepage.tudelft.nl/u04r0/thesis/matlab-data/';
+	var ansys_base_folder = 'ansys-data/';
+	var matlab_base_folder = 'matlab-data/';
 	var ansys_sub_folder = getParameterByName('ansys');
 	var matlab_sub_folder = getParameterByName('matlab');
 	$("h2#title").html('Compare Ansys run: ' + ansys_sub_folder + ' to Matlab run: ' + matlab_sub_folder);
@@ -86,7 +86,6 @@ $(document).ready(function() {
 			// Split the lines
 			var lines1 = data1[0].split('\n');
 			var lines2 = data2[0].split('\n');
-
 			//define array with input categories
 			var input_categories = [];
 			var timestep = '';
@@ -171,7 +170,6 @@ $(document).ready(function() {
 						}
 					});
 					//create an object for every input_category in the series array
-					console.log(iterate_start);
 					for (i=iterate_start;i<input_categories.length;i++) {
 						options.series.push({
 							name: input_categories[i],
@@ -189,7 +187,10 @@ $(document).ready(function() {
 						$.each(items, function(itemNo, item) {
 							//check if item exists and is a number
 							if(!isNaN(item) && $.trim(item)) {
-								options.series[iterate_start].data.push(parseFloat(item));
+								var cat_nr = iterate_start + itemNo;
+								//console.log('itemNo is: ' + itemNo + ', but I put data in: ' + cat_nr);
+								//console.log('catnr is: ' + cat_nr + ' and I submit item: ' + item);
+								options.series[cat_nr].data.push(parseFloat(item));
 							}
 						});
 					}

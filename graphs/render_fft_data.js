@@ -16,7 +16,7 @@ $(document).ready(function() {
     return decodeURIComponent(results[2].replace(/\+/g, " "));
 }
 	//location of data files
-	var data_base_folder = 'http://homepage.tudelft.nl/u04r0/thesis/experiment-data/bridge/fft/';
+	var data_base_folder = 'experiment-data/bridge/fft/';
 	$("h2#title").html('Kuilenburgse spoorbrug measurements March 24, 2016; fast fourier transform of bridge parts');
 	var data_files = [];
 	var graph_name = [];
