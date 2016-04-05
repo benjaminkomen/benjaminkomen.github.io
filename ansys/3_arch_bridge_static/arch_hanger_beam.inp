@@ -1,0 +1,209 @@
+!Name:			arch_hanger_beam
+!Date:			March 1, 2016
+!Last modified: March 4, 2016
+!Description:	Ansys model of arch beam, with hangers as beam/link elements
+
+!******************************************************************
+finish
+/clear
+/prep7
+
+!define some input variables
+!general
+l  			= 154.42				!length bridge [m]
+l_sp		= 11.03					!hanger spacing [m]
+nh			= 13					!number of hangers
+v  			= 27.78	 	 			!velocity [m/s]
+g  			= 9.81					!gravitational acceleration [m/s2]
+ne 			= 25					!number of elements between hangers
+nn 			= ne + 1				!number of nodes between hangers
+ng 			= ((nh+1)*ne)+1			!number of nodes on girder
+dl 			= l / ne				!delta length of small element
+dl2			= l_sp / ne				!delta length keypoints girder
+dt 			= dl / v  				!delta time of one time step
+
+!steel
+E_st		= 2.1e11				!Youngs modulus [N/m2]
+rho_st		= 7850					!Density steel [kg/m3]
+alph_st		= 12e-6					!Thermal coefficient [1/K]
+mu_st		= 0.3					!Poissons ratio
+
+!equivalent arch
+A_arch		= 0.598					!Cross sectional area [m2]
+I_arch		= 1.599					!Moment of inertia arch [m4]
+H_arch		= 4.00					!Height arch [m]
+alph_a 		= 1.577					!mass modification factor
+
+!equivalent girder
+A_girder	= 0.447					!Cross sectional area [m2]
+I_girder	= 0.107					!Moment of inertia arch [m4]
+H_girder	= 1.42					!Height arch [m]
+alph_g 		= 2.101					!mass modification factor
+
+!equivalent hanger
+A_hanger	= 0.059					!Cross sectional area [m2]
+I_hanger	= 1.75e-3				!Moment of inertia arch [m4]
+H_hanger	= 0.40					!Height arch [m]
+
+nn_t		= nn+1					!array dimension counter
+
+!******************************************************************
+!define material types
+!steel arch
+mp,  ex,1,E_st
+mp,nuxy,1,mu_st
+mp,dens,1,alph_a*rho_st
+mp,alpx,1,alph_st
+
+!steel girder
+mp,  ex,2,E_st
+mp,nuxy,2,mu_st
+mp,dens,2,alph_g*rho_st
+mp,alpx,2,alph_st
+
+!steel hanger
+mp,  ex,3,E_st
+mp,nuxy,3,mu_st
+mp,dens,3,rho_st
+mp,alpx,3,alph_st
+
+!******************************************************************
+!define element types
+!arch
+et,1,beam3
+r,1,A_arch,I_arch,H_arch
+
+!girder
+et,2,beam3
+r,2,A_girder,I_girder,H_girder
+
+!hanger as beam
+et,3,beam3
+r,3,A_hanger,I_hanger,H_hanger
+
+!hanger as link
+!et,3,link8
+!r,3,A_hanger
+
+!******************************************************************
+!place keypoints and lines and attach properties
+!girder
+*do,i,1,ng
+	k,i,(i-1)*dl2,0,0
+	*if,i,ne,1,then
+		l,i-1,i
+	*endif
+*enddo
+
+latt,2,2,2										!associate selected lines with material 2, real constant set 2 and element type 2
+lsel,none
+
+*get,key_end,kp,,num,max						!get highest keypoint of girder	
+
+!arch and hangers
+*do,i,1,nh
+	cur_x = i*l_sp								!current x position of hanger
+	cur_y = 0.647585*cur_x-0.00419366*cur_x**2	!current y position of hanger
+	k,,cur_x,cur_y,0							!arch keypoint
+	
+	*get,maxkey,kp,,num,max						!current maximum keypoint number
+	lsel,none
+	*if,i,eq,1,then
+		l,1,maxkey								!first arch segment from keypoint 1 to maxkey
+		latt,1,1,1								!associate selected lines with material 1, real constant set 1 and element type 1
+	*elseif,i,eq,nh,then
+		l,maxkey-2,maxkey
+		l,maxkey,key_end						!last arch segment from keypoint to key_end
+		latt,1,1,1
+	*else
+		l,maxkey-2,maxkey						!other arch segments, fromline from previous keypoint to current
+		latt,1,1,1
+	*endif
+	lsel,none
+	kb1 = maxkey + 1							!define orientation keypoint number
+	k,kb1,cur_x,0,10								!create orientation keypoint
+	key_gir = kp(cur_x,0,0)						!keypoint number, bottom of current hanger
+	l,key_gir,maxkey							!hanger line
+	latt,3,3,3,,kb1								!associate selected lines with material 1, real constant set 3 and element type 3
+*enddo
+
+lsel,all
+
+!******************************************************************
+!meshing
+!girder
+lsel,s,type,,2			!select all lines of element type 2
+lesize,all,,,1			!number of element divisions per line
+lmesh,all				!generate nodes and line elements along all selected lines
+
+!arch
+lsel,s,type,,1			!select all lines of element type 1
+lesize,all,,,(ne/3)		!number of element divisions per line
+lmesh,all				!generate nodes and line elements along all selected lines
+
+!hangers
+lsel,s,type,,3			!select all lines of element type 3
+lesize,all,,,(ne/3)		!more possible with beam3 element
+!lesize,all,,,1			!only one for link8 element
+lmesh,all				!generate nodes and line elements along all selected lines
+
+!******************************************************************
+!DOFs
+!bridge simply supported DOF
+nsel,s,loc,x,0			!x = 0
+nsel,r,loc,y,0			!y = 0
+d,all,ux,,,,,uy
+nsel,s,loc,x,l			!x = l
+nsel,r,loc,y,0			!y = 0
+d,all,uy
+allsel
+
+!******************************************************************
+!end of preprocessor, begin static analysis
+finish
+/solu
+
+antype,stat
+
+!******************************************************************
+!full loading over girder
+esel,s,type,,2
+sfbeam,all,,pres,90000,90000	!distributed load on girder
+allsel
+
+!******************************************************************
+!anti symmetric loading over girder
+esel,s,type,,2
+esel,r,cent,x,0,(l/2)		!only select left half
+sfbeam,all,,pres,90000,90000
+allsel
+
+!esel,s,type,,2
+!esel,r,cent,x,(l/2),l		!only select right half
+!sfbeam,all,,pres,-90000,-90000
+!allsel
+
+solve
+
+!******************************************************************
+!begin modal analysis
+finish
+/solu
+antype,modal
+modopt,subsp,100,,,
+eqslv,front
+mxpand,100,,,
+solve
+
+finish
+/post1
+set,list
+
+!******************************************************************
+!post processing
+finish
+/post1
+
+nc = node(l/4,0,0)
+nsel,node,nc
+prnsol,dof

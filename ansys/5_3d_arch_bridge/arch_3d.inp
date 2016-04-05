@@ -1,0 +1,741 @@
+!Name:			arch_3d
+!Date:			March 14, 2016
+!Last modified: March 29, 2016
+!Description:	3D Arch beam, with n bogies moving over it
+
+!******************************************************************
+finish
+/clear
+/prep7
+
+!define some input variables
+!general
+l  			= 154.42				!length bridge [m]
+l_sp		= 11.03					!hanger spacing [m]
+l_tr		= 10.3					!transverse length [m]
+l_l1		= 3.15					!distance to first long girder [m]
+l_l2		= 7.15					!distance to second long girder [m]
+nh			= 13					!number of hangers
+v  			= 44.44	 	 			!velocity [m/s]
+g  			= 9.81					!gravitational acceleration [m/s2]
+ne 			= 25					!number of elements between hangers
+nn 			= ne + 1				!number of nodes between hangers
+neg			= ((nh+1)*ne)			!number of elements on long girder
+nng 		= neg+1					!number of nodes on long girder
+dl 			= l / neg				!delta length of small element [m]
+dl2			= l_sp / ne				!delta length keypoints long girder [m]
+dt 			= dl / v  				!delta time of one time step [t]
+
+!vehicles
+m1 			= 52500					!sprung vehicle mass [kg]
+m2 			= 9000					!unsprung bogie mass [kg]
+k1 			= 732743				!spring stiffness [N/m]
+c1 			= 73703					!damping value [Ns/m]
+nv			= 12					!number of travelling sprung masses
+*dim,bog_x,,nv						!bogies initial x-coordinate positions array
+bog_x(1) 	= 0
+bog_x(2) 	= -24
+bog_x(3) 	= -27
+bog_x(4) 	= -51
+bog_x(5) 	= -54
+bog_x(6) 	= -78
+bog_x(7) 	= -81
+bog_x(8) 	= -105
+bog_x(9) 	= -108
+bog_x(10) 	= -132
+bog_x(11) 	= -135
+bog_x(12) 	= -159
+
+*dim,bog_n,,nv						!bogies initial node positions array
+
+*do,i,2,nv
+	bog_n(%i%) = nint(bog_x(%i%)/dl)
+*enddo
+
+!steel
+E_st		= 2.1e11				!Youngs modulus [N/m2]
+rho_st		= 7850					!Density steel [kg/m3]
+alph_st		= 12e-6					!Thermal coefficient [1/K]
+mu_st		= 0.3					!Poissons ratio
+
+!arch
+A_arch		= 0.598					!Cross sectional area [m2]
+I_arch		= 1.599					!Moment of inertia arch [m4]
+H_arch		= 4.00					!Height arch [m]
+W_arch      = A_arch/H_arch			!Width arch [m]
+alph_a 		= 1.577					!mass modification factor
+
+!main girder
+A_mgir		= 0.447					!Cross sectional area [m2]
+I_mgir		= 0.107					!Moment of inertia main girder [m4]
+H_mgir		= 1.42					!Height main girder [m]
+W_mgir	    = A_mgir/H_mgir			!Width main girder [m]
+alph_g 		= 2.101					!mass modification factor
+
+!longitudinal girder
+A_lgir		= 0.447					!Cross sectional area [m2]
+I_lgir		= 0.107					!Moment of inertia long girder [m4]
+H_lgir		= 1.42					!Height long girder [m]
+W_lgir		= A_lgir/H_lgir			!Width long girder [m]
+
+!transverse girder 0
+A_tgir0		= 0.1313				!Cross sectional area [m2]
+I_tgir0		= 6.316e-2				!Moment of inertia trans girder [m4]
+H_tgir0		= 1.77					!Height trans girder [m]
+W_tgir0		= A_tgir0/H_tgir0		!Width trans girder [m]
+
+!transverse girder A
+A_tgirA		= 0.12189				!Cross sectional area [m2]
+I_tgirA		= 3.289e-2				!Moment of inertia trans girder [m4]
+H_tgirA		= 1.45					!Height trans girder [m]
+W_tgirA		= A_tgirA/H_tgirA		!Width trans girder [m]
+
+!transverse girder
+A_tgir		= 0.11176				!Cross sectional area [m2]
+I_tgir		= 4.220e-2				!Moment of inertia trans girder [m4]
+H_tgir		= 1.50					!Height trans girder [m]
+W_tgir		= A_tgir/H_tgir			!Width trans girder [m]
+
+!hanger
+A_hanger	= 0.059					!Cross sectional area [m2]
+I_hanger	= 1.75e-3				!Moment of inertia hanger [m4]
+H_hanger	= 0.40					!Height hanger [m]
+W_hanger    = A_hanger/H_hanger		!Width hanger [m]
+
+!end portal
+A_por		= 0.08688				!Cross sectional area [m2]
+I_por		= 1.958e-2				!Moment of inertia portal [m4]
+H_por		= 1.21					!Height portal [m]
+W_por		= A_por/H_por			!Width portal [m]
+
+!arch bracing
+A_brac		= 0.0358				!Cross sectional area [m2]
+I_brac		= 3.141e-3				!Moment of inertia bracing [m4]
+H_brac		= 0.70					!Height bracing [m]
+W_brac		= A_brac/H_brac			!Width bracing [m]
+
+nn_t	= 2*nng+abs(bog_n(%nv%))+1		!array dimension counter
+
+!******************************************************************
+!define the dimension of some output variables
+*dim,t,,nn_t					!time
+
+!bridge
+*dim,ub_mid,,nn_t				!displacement bridge midspan
+*dim,ub_25,,nn_t				!displacement bridge at one quarter
+
+!masses
+*dim,uv,,nn_t,nv				!displacement bogie
+*dim,vv,,nn_t,nv				!velocity bogie
+*dim,av,,nn_t,nv				!acceleration bogie
+*dim,ub,,nn_t,nv				!displacement bridge
+*dim,vb,,nn_t,nv				!velocity bridge
+*dim,ab,,nn_t,nv				!acceleration bridge
+
+!write header info to header arrays for output
+*dim,uv_head,char,1,nv
+*dim,vv_head,char,1,nv
+*dim,av_head,char,1,nv
+*do,i,1,nv
+	uv_head(1,i) = 'uv%i%,'
+	vv_head(1,i) = 'vv%i%,'
+	av_head(1,i) = 'av%i%,'
+*enddo
+
+!******************************************************************
+!define material types
+!steel arch
+mp,  ex,1,E_st
+mp,nuxy,1,mu_st
+mp,dens,1,alph_a*rho_st
+mp,alpx,1,alph_st
+
+!steel main girder
+mp,  ex,2,E_st
+mp,nuxy,2,mu_st
+mp,dens,2,alph_g*rho_st
+mp,alpx,2,alph_st
+
+!steel hanger
+mp,  ex,3,E_st
+mp,nuxy,3,mu_st
+mp,dens,3,rho_st
+mp,alpx,3,alph_st
+
+!steel longitudinal girder
+mp,  ex,6,E_st
+mp,nuxy,6,mu_st
+mp,dens,6,alph_g*rho_st
+mp,alpx,6,alph_st
+
+!steel transverse girder 0
+mp,  ex,7,E_st
+mp,nuxy,7,mu_st
+mp,dens,7,alph_g*rho_st
+mp,alpx,7,alph_st
+
+!steel transverse girder A
+mp,  ex,8,E_st
+mp,nuxy,8,mu_st
+mp,dens,8,alph_g*rho_st
+mp,alpx,8,alph_st
+
+!steel transverse girder
+mp,  ex,9,E_st
+mp,nuxy,9,mu_st
+mp,dens,9,alph_g*rho_st
+mp,alpx,9,alph_st
+
+!steel end portal
+mp,  ex,10,E_st
+mp,nuxy,10,mu_st
+mp,dens,10,alph_g*rho_st
+mp,alpx,10,alph_st
+
+!steel arch bracing
+mp,  ex,11,E_st
+mp,nuxy,11,mu_st
+mp,dens,11,alph_g*rho_st
+mp,alpx,12,alph_st
+
+!******************************************************************
+!define element types and cross sections
+!arch
+et,1,beam188
+sectype,1,beam,rect			! rectangular beam
+secdata,W_arch,H_arch		! width and height [m]
+
+!main girder
+et,2,beam188
+sectype,2,beam,rect			! rectangular beam
+secdata,W_mgir,H_mgir		! width and height [m]
+
+!hanger as beam
+et,3,beam188
+sectype,3,beam,rect			! rectangular beam
+secdata,W_hanger,H_hanger	! width and height [m]
+
+!define bogies
+et,4,mass21,,,4
+r,11,m1						!bogie upper mass
+r,12,m2  					!bogie lower mass
+
+!define spring-damper
+et,5,combin14,,2
+r,21,k1,c1					!spring and damper values
+
+!longitudinal girder
+et,6,beam188
+sectype,6,beam,rect			! rectangular beam
+secdata,W_lgir,H_lgir		! width and height [m]
+
+!transverse girder 0
+et,7,beam188
+sectype,7,beam,rect			! rectangular beam
+secdata,W_tgir0,H_tgir0		! width and height [m]
+
+!transverse girder A
+et,8,beam188
+sectype,8,beam,rect			! rectangular beam
+secdata,W_tgirA,H_tgirA		! width and height [m]
+
+!transverse girder
+et,9,beam188
+sectype,9,beam,rect			! rectangular beam
+secdata,W_tgir,H_tgir		! width and height [m]
+
+!end portal
+et,10,beam188
+sectype,10,beam,rect			! rectangular beam
+secdata,W_por,H_por				! width and height [m]
+
+!arch bracings
+et,11,beam188
+sectype,11,beam,rect			! rectangular beam
+secdata,W_brac,H_brac			! width and height [m]
+
+!******************************************************************
+!place keypoints and lines and attach properties
+!west main girder
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+cur_x = 0
+lsel,none
+*do,i,1,nh+1
+	*if,cur_max,eq,0,then
+		k,1,0,0,0
+		cur_max = 1
+	*elseif,i,eq,1,then
+		k,cur_max,0,0,0
+		cur_max = cur_max + 1
+	*elseif,cur_x,le,l_sp,then
+		!mesh first segment finer to have keypoints for trans girder A
+		*do,ii,1,ne
+			cur_max = cur_max + 1
+			k,cur_max,ii*dl2,0,0
+			l,cur_max-1,cur_max
+		*enddo
+	*elseif,cur_x,ge,13*l_sp,then
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*l_sp,0,0
+		l,cur_max-1,cur_max
+		!mesh last segment finer to have keypoints for trans girder A
+		*do,ii,1,ne
+			cur_max = cur_max + 1
+			k,cur_max,cur_x+ii*dl2,0,0
+			l,cur_max-1,cur_max
+		*enddo
+	*else
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*l_sp,0,0
+		l,cur_max-1,cur_max
+	*endif
+	cur_x = cur_x + l_sp
+*enddo
+
+!east main girder
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+cur_x = 0
+*do,i,1,nh+1
+	*if,cur_max,eq,0,then
+		k,1,0,0,l_tr
+		cur_max = 1
+	*elseif,i,eq,1,then
+		cur_max = cur_max + 1
+		k,cur_max,0,0,l_tr
+	*elseif,cur_x,le,l_sp,then
+		!mesh first segment finer to have keypoints for trans girder A
+		*do,ii,1,ne
+			cur_max = cur_max + 1
+			k,cur_max,ii*dl2,0,l_tr
+			l,cur_max-1,cur_max
+		*enddo
+	*elseif,cur_x,ge,13*l_sp,then
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*l_sp,0,l_tr
+		l,cur_max-1,cur_max
+		!mesh last segment finer to have keypoints for trans girder A
+		*do,ii,1,ne
+			cur_max = cur_max + 1
+			k,cur_max,cur_x+ii*dl2,0,l_tr
+			l,cur_max-1,cur_max
+		*enddo
+	*else
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*l_sp,0,l_tr
+		l,cur_max-1,cur_max
+	*endif
+	cur_x = cur_x + l_sp
+*enddo
+
+latt,2,,2,,,,2									!associate selected lines with material 2, element type 2 and sectype 2
+lsel,none
+
+!west longitudinal girder
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+*do,i,1,nng
+	*if,cur_max,eq,0,then
+		k,1,(i-1)*dl2,0,l_l1
+		cur_max = 2
+	*elseif,i,eq,1,then
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*dl2,0,l_l1
+	*else
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*dl2,0,l_l1
+		l,cur_max-1,cur_max
+	*endif
+*enddo
+
+!east longitudinal girder
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+*do,i,1,nng
+	*if,cur_max,eq,0,then
+		k,1,(i-1)*dl2,0,l_l2
+		cur_max = 2
+	*elseif,i,eq,1,then
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*dl2,0,l_l2
+	*else
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*dl2,0,l_l2
+		l,cur_max-1,cur_max
+	*endif
+*enddo
+
+latt,6,,6,,,,6
+lsel,none
+
+!end transverse girders 0
+key_01 = kp(0,0,0)
+key_02 = kp(0,0,l_l1)
+key_03 = kp(0,0,l_l2)
+key_04 = kp(0,0,l_tr)
+key_05 = kp(l,0,0)
+key_06 = kp(l,0,l_l1)
+key_07 = kp(l,0,l_l2)
+key_08 = kp(l,0,l_tr)
+
+l,key_01,key_02
+l,key_02,key_03
+l,key_03,key_04
+l,key_05,key_06
+l,key_06,key_07
+l,key_07,key_08
+
+latt,7,,7,,,,7
+lsel,none
+
+!end transverse girders A
+key_A1 = kp(4.469,0,0)
+key_A2 = kp(4.469,0,l_l1)
+key_A3 = kp(4.469,0,l_l2)
+key_A4 = kp(4.469,0,l_tr)
+key_A5 = kp(l-4.469,0,0)
+key_A6 = kp(l-4.469,0,l_l1)
+key_A7 = kp(l-4.469,0,l_l2)
+key_A8 = kp(l-4.469,0,l_tr)
+
+l,key_A1,key_A2
+l,key_A2,key_A3
+l,key_A3,key_A4
+l,key_A5,key_A6
+l,key_A6,key_A7
+l,key_A7,key_A8
+
+latt,8,,8,,,,8
+lsel,none
+
+!transverse girders
+*do,i,1,nh
+	cur_x = i*l_sp
+	key_t1 = kp(cur_x,0,0)
+	key_t2 = kp(cur_x,0,l_l1)
+	key_t3 = kp(cur_x,0,l_l2)
+	key_t4 = kp(cur_x,0,l_tr)
+	l,key_t1,key_t2
+	l,key_t2,key_t3
+	l,key_t3,key_t4
+*enddo
+latt,9,,9,,,,9
+lsel,none
+
+!west arch and hangers
+*do,i,1,2*nh+1
+	cur_x = i*0.5*l_sp							!current x position of hanger
+	cur_y = 0.647585*cur_x-0.00419366*cur_x**2	!current y position of hanger
+	*get,maxkey,kp,,num,max						!current maximum keypoint number
+	
+	!arch segments
+	k,maxkey+1,cur_x,cur_y,0					!arch west keypoint
+	k,maxkey+2,cur_x,cur_y,l_tr					!arch east keypoint
+	lsel,none
+	*if,i,eq,1,then
+		l,key_01,maxkey+1						!first arch seg west
+		l,key_04,maxkey+2						!first arch seg east
+		latt,1,,1,,,,1							!associate selected lines with material 1, cross seg 1 and element type 1
+	*elseif,i,eq,2*nh+1,then
+		l,maxkey-1,maxkey+1						!arch seg west
+		l,maxkey,maxkey+2						!arch seg east
+		l,maxkey+1,key_05						!last arch seg west
+		l,maxkey+2,key_08						!last arch seg east
+		latt,1,,1,,,,1
+	*else
+		l,maxkey-1,maxkey+1						!arch seg west
+		l,maxkey,maxkey+2						!arch seg east
+		latt,1,,1,,,,1
+	*endif
+	lsel,none
+	
+	!hangers on even keypoints
+	mod_i = mod(i,2)							!modulus of i
+	*if,mod_i,eq,0,then
+		key_gir1 = kp(cur_x,0,0)				!keypoint number, bottom of current hanger
+		key_gir2 = kp(cur_x,0,l_tr)
+		l,key_gir1,maxkey+1						!hanger line
+		latt,3,,3,,keygir2,,,3					!associate selected lines with material 1, real constant set 3 and element type 3
+		l,key_gir2,maxkey+2
+		latt,3,,3,,keygir1,,,3
+	*endif
+*enddo
+
+!end portals
+cur_x = 1.5*l_sp							!x position end portal 1
+cur_y = 0.647585*cur_x-0.00419366*cur_x**2	!y position end portal 1
+
+key_p1 = kp(cur_x,cur_y,0)
+key_p2 = kp(cur_x,cur_y,l_tr)
+key_p3 = kp(l-cur_x,cur_y,0)
+key_p4 = kp(l-cur_x,cur_y,l_tr)
+
+lsel,none
+l,key_p1,key_p2
+l,key_p3,key_p4
+
+latt,10,,10,,,,10
+lsel,none
+
+!arch bracings
+*do,i,1,nh-2
+	cur_x = 1.5*l_sp+i*l_sp
+	cur_y = 0.647585*cur_x-0.00419366*cur_x**2
+	
+	prev_x = cur_x-l_sp
+	prev_y = 0.647585*prev_x-0.00419366*prev_x**2
+	
+	cur_key1 = kp(cur_x,cur_y,0) 
+	cur_key2 = kp(cur_x,cur_y,l_tr)
+	prev_key1 = kp(prev_x,prev_y,0)
+	prev_key2 = kp(prev_x,prev_y,l_tr)
+	
+	l,prev_key1,cur_key2				!bracing west - east
+	l,prev_key2,cur_key1				!bracing east - west
+*enddo
+latt,11,,11,,,,11
+
+lsel,all
+
+!******************************************************************
+!meshing
+!longitudinal girders separate to have fine mesh for train dt
+lsel,s,type,,6			!select all lines of element type 6
+lesize,all,,,1			!number of element divisions per line
+lmesh,all				!generate nodes and line elements along all selected lines
+
+!the rest
+lsel,inve
+lesize,all,,,3			!number of element divisions per line
+lmesh,all				!generate nodes and line elements along all selected lines
+
+!bogies
+*do,i,1,nv
+	!place bogie masses
+	type,4
+	real,11
+	n,(10000+2*i),(5+i),30.5		!upper mass
+	e,(10000+2*i)
+	real,12
+	n,(10000+i+(i-1)),(5+i),30		!lower mass
+	e,(10000+i+(i-1))
+	
+	!place vehicle spring-dampers
+	type,5
+	real,21
+	en,(10000+2*i),(10000+2*i),(10000+i+(i-1))
+	
+	!constrain lower mass, all DOF
+	d,(10000+i+(i-1)),all
+*enddo
+
+!******************************************************************
+!DOFs
+!set tolerance to lower value to exactly select nodes
+seltol,1.0e-6
+
+!one support completely constrained
+nsel,s,loc,x,0			!x = 0
+nsel,r,loc,y,0			!y = 0
+nsel,r,loc,z,0			!z = 0
+d,all,ux,,,,,uy,uz
+
+!second support one way constrained
+nsel,s,loc,x,0			!x = 0
+nsel,r,loc,y,0			!y = 0
+nsel,r,loc,z,l_tr		!z = 10.3
+d,all,uy
+
+!third support one way constrained
+nsel,s,loc,x,l			!x = 154.42
+nsel,r,loc,y,0			!y = 0
+nsel,r,loc,z,l_tr		!z = 10.3
+d,all,uy
+
+!fourth support one way constrained
+nsel,s,loc,x,l			!x = 154.42
+nsel,r,loc,y,0			!y = 0
+nsel,r,loc,z,0			!z = 0
+d,all,uy,,,,,uz
+
+allsel
+
+!******************************************************************
+!end of preprocessor, begin static analysis
+finish
+/solu
+
+!esel,s,type,,2
+!esel,r,cent,x,0,(l/2)		!only select left half
+!sfbeam,all,2,pres,1000,1000
+!allsel
+
+!esel,s,type,,2
+!esel,r,cent,x,(l/2),l		!only select right half
+!sfbeam,all,2,pres,-1000,-1000
+!allsel
+
+!solve
+
+!finish
+
+antype,trans
+
+!first perform a static load step
+time,dt/1000
+timint,off			!no transient effects
+solve
+
+!******************************************************************
+!initial conditions
+t(1) = 0
+
+!bridge
+ub_mid(1)=uy(node(l/2,0,0))
+ub_25(1)=uy(node(l/4,0,0))
+
+!bogies
+*do,i,1,nv
+	uv(1,i)=uy(10000+2*i)
+	vv(1,i)=0
+	av(1,i)=0
+	ub(1,i)=0
+	vb(1,i)=0
+	ab(1,i)=0
+*enddo
+
+!determine first and last node numbers
+node_one = node(0,0,l_l2)
+node_end = node(l,0,l_l2)
+
+bog_n(1) 	= node_one+1					!node number of bogie 1
+
+!now perform a transient analysis (default = full), first only apply a load at node 2
+timint,on						!include transient effects
+time,dt
+f,node_one+1,fy,-(m1*g+m2*g)
+solve
+
+!******************************************************************
+!loop over bridge
+*do,ii,node_one+1,nn_t
+	!write data to arrays
+	t(ii) = (ii-1)*dt
+	!bridge
+	ub_mid(ii)=uy(node(l/2,0,l_l2))
+	ub_25(ii)=uy(node(l/4,0,l_l2))
+	
+	!bogies
+	*do,i,1,nv
+		uv(ii,i)=uy(10000+2*i)
+		vv(ii,i)=(uv(ii,i)-uv(ii-1,i))/dt
+		av(ii,i)=(vv(ii,i)-vv(ii-1,i))/dt
+		
+		!bridge deflection under bogie is bridge node deflection, if bogie is still on beam, else zero (post approach bridge no deflection)
+		*if,bog_n(i),GE,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			ub(ii,i)=uy(bog_n(i)+1)
+		*else
+			ub(ii,i)=0
+		*endif
+		
+		vb(ii,i)=(ub(ii,i)-ub(ii-1,i))/dt
+		ab(ii,i)=(vb(ii,i)-vb(ii-1,i))/dt
+	*enddo
+
+	time,ii*dt
+	fdele,all,all
+
+	!move vehicles one node
+	*do,i,1,nv
+		bog_n(i) = bog_n(i)+1
+		!if bogies reach the bridge, give them node number of start bridge, not necessarily 1
+		*if,bog_n(i),eq,0,THEN
+			bog_n(i) = node_one
+		*endif
+	*enddo
+
+	!apply contact force on beam, if bogie is already/still on beam
+	*do,i,1,nv
+		*if,bog_n(i),GT,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			f,bog_n(i),fy,(-m1*g-m2*g-m2*ab(ii,i)+k1*(uv(ii,i)-ub(ii,i))+c1*(vv(ii,i)-vb(ii,i)))
+		*endif
+	*enddo
+
+	!give vehicles reaction displacement
+	*do,i,1,nv
+		d,(10000+i+(i-1)),uy,ub(ii,i)
+	*enddo
+	
+	solve
+*enddo
+
+!******************************************************************
+!write results to output files
+!bridge deflection
+*cfopen,0,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:defle','ction [m',']'
+(3A)
+*vwrite,'title:br','idge def','lection'
+(3A)
+*vwrite,'ub_mid',',','ub_quart'
+(3A)
+*vwrite,ub_mid(1),',',ub_25(1)
+(3(F20.16,A))
+*cfclose
+
+!bogies deflection
+*cfopen,1,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:verti','cal DOF ','[m]'
+(4A)
+*vwrite,'title:bo','gies ver','tical DO','F'
+(3A)
+*cfclose
+/nopr
+/output,1,txt,,append
+*mwrite,uv_head(1,1)
+(12A)
+*mwrite,uv(1,1),,,,,,,
+(12(F20.16',')F20.16)
+
+!bogies velocity
+*cfopen,2,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:veloc','ity [m/s',']'
+(4A)
+*vwrite,'title:bo','gies vel','ocity'
+(3A)
+*cfclose
+/nopr
+/output,2,txt,,append
+*mwrite,vv_head(1,1)
+(12A)
+*mwrite,vv(1,1),,,,,,,
+(12(F20.16',')F20.16)
+
+!bogies acceleration
+*cfopen,3,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:accel','eration ','[m/s2]'
+(4A)
+*vwrite,'title:bo','gies acc','eleratio','n'
+(4A)
+*cfclose
+/nopr
+/output,3,txt,,append
+*mwrite,av_head(1,1)
+(12A)
+*mwrite,av(1,1),,,,,,,
+(12(F20.16',')F20.16)
+
+!******************************************************************
+!post processing
+finish
+!/post1
+
+!nc = node(l/4,0,0)
+!nsol,2,nc,u,y	
+!nsel,node,nc
+!prnsol,dof

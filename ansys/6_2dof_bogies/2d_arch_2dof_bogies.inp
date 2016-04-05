@@ -1,0 +1,482 @@
+!Name:			2d_arch_2dof_bogies
+!Date:			April 4, 2016
+!Last modified: April 5, 2016
+!Description:	2D arch bridge, with n 2DOF bogies moving over it
+
+!******************************************************************
+finish
+/clear
+/prep7
+
+!define some input variables
+!general
+l  			= 154.42				!length bridge [m]
+l_sp		= 11.03					!hanger spacing [m]
+nh			= 13					!number of hangers
+v  			= 125/3.6 	 			!velocity [m/s]
+g  			= 9.81					!gravitational acceleration [m/s2]
+ne 			= 50					!number of elements between hangers
+nn 			= ne + 1				!number of nodes between hangers
+neg			= ((nh+1)*ne)			!number of elements on girder
+nng 		= neg+1					!number of nodes on girder
+dl 			= l / neg				!delta length of small element [m]
+dl2			= l_sp / ne				!delta length keypoints girder [m]
+dt 			= dl / v  				!delta time of one time step [t]
+node_one 	= 1						!number of first node where bogies move
+node_end 	= nn					!number of last node where bogies move
+
+!vehicles
+!coaches
+m_1m		= 0.5*50000				!motor coach mass [kg]
+m_1t		= 0.5*43000				!trailer coach mass [kg]
+!motor bogie
+m_2m		= 8620					!motor frame mass [kg]
+m_3m		= 2*1200				!two motor wheelsets mass [kg]
+k_pm		= 5000000				!primary stiffness motor bogie [N/m]
+c_pm		= 103803				!primary damping motor bogie [Ns/m]
+k_sm		= 920000				!secondary stiffness motor bogie [N/m]
+c_sm		= 1						!secondary damping motor bogie [Ns/m]
+!trailer bogie
+m_2t		= 8370					!trailer frame mass [kg]
+m_3t		= 2*1700				!two trailer wheelsets mass [kg]
+k_pt		= 3400000				!primary stiffnes trailer bogie [N/m]
+c_pt		= 64996					!primary damping trailer bogie [Ns/m]
+k_st		= 920000				!secondary stiffnes trailer bogie [N/m]
+c_st		= 1						!secondary damping trailer bogie [Ns/m]
+
+nv			= 12					!number of bogies
+*dim,bog_x,,nv						!bogies initial x-coordinate positions array assuming 6 part VIRM
+bog_x(1) 	= 0
+bog_x(2) 	= -20
+bog_x(3) 	= bog_x(2)-3.55-3.05
+bog_x(4) 	= bog_x(3)-20
+bog_x(5) 	= bog_x(4)-3.05-3.55
+bog_x(6) 	= bog_x(5)-20
+bog_x(7) 	= bog_x(6)-3.55-3.05
+bog_x(8) 	= bog_x(7)-20
+bog_x(9) 	= bog_x(8)-3.05-3.55
+bog_x(10) 	= bog_x(9)-20
+bog_x(11) 	= bog_x(10)-3.55-3.05
+bog_x(12) 	= bog_x(11)-20
+
+*dim,bog_n,,nv						!bogies initial node positions array
+bog_n(1) 	= 2						!node number of bogie 1
+
+*do,i,2,nv
+	bog_n(%i%) = nint(bog_x(%i%)/dl)
+*enddo
+
+!steel
+E_st		= 2.1e11				!Youngs modulus [N/m2]
+rho_st		= 7850					!Density steel [kg/m3]
+alph_st		= 12e-6					!Thermal coefficient [1/K]
+mu_st		= 0.3					!Poissons ratio
+
+!equivalent arch
+A_arch		= 0.598					!Cross sectional area [m2]
+I_arch		= 1.599					!Moment of inertia arch [m4]
+H_arch		= 4.00					!Height arch [m]
+alph_a 		= 1.577					!mass modification factor
+
+!equivalent girder
+A_girder	= 0.447					!Cross sectional area [m2]
+I_girder	= 0.107					!Moment of inertia arch [m4]
+H_girder	= 1.42					!Height arch [m]
+alph_g 		= 2.101					!mass modification factor
+
+!equivalent hanger
+A_hanger	= 0.059					!Cross sectional area [m2]
+I_hanger	= 1.75e-3				!Moment of inertia arch [m4]
+H_hanger	= 0.40					!Height arch [m]
+
+nn_t	= 2*nng+abs(bog_n(%nv%))+1		!array dimension counter
+
+!******************************************************************
+!define the dimension of some output variables
+*dim,t,,nn_t					!time
+
+!bridge
+*dim,ub_mid,,nn_t				!displacement bridge midspan
+*dim,ub_25,,nn_t				!displacement bridge at one quarter
+
+!masses
+*dim,uv,,nn_t,nv				!displacement bogie
+*dim,vv,,nn_t,nv				!velocity bogie
+*dim,av,,nn_t,nv				!acceleration bogie
+*dim,ub,,nn_t,nv				!displacement bridge
+*dim,vb,,nn_t,nv				!velocity bridge
+*dim,ab,,nn_t,nv				!acceleration bridge
+
+!write header info to header arrays for output
+*dim,uv_head,char,1,nv
+*dim,vv_head,char,1,nv
+*dim,av_head,char,1,nv
+*do,i,1,nv
+	uv_head(1,i) = 'uv%i%,'
+	vv_head(1,i) = 'vv%i%,'
+	av_head(1,i) = 'av%i%,'
+*enddo
+
+!******************************************************************
+!define material types
+!steel arch
+mp,  ex,1,E_st
+mp,nuxy,1,mu_st
+mp,dens,1,alph_a*rho_st
+mp,alpx,1,alph_st
+
+!steel girder
+mp,  ex,2,E_st
+mp,nuxy,2,mu_st
+mp,dens,2,alph_g*rho_st
+mp,alpx,2,alph_st
+
+!steel hanger
+mp,  ex,3,E_st
+mp,nuxy,3,mu_st
+mp,dens,3,rho_st
+mp,alpx,3,alph_st
+
+!******************************************************************
+!define element types
+!arch
+et,1,beam3
+r,1,A_arch,I_arch,H_arch
+
+!girder
+et,2,beam3
+r,2,A_girder,I_girder,H_girder
+
+!hanger as beam
+et,3,beam3
+r,3,A_hanger,I_hanger,H_hanger
+
+!define bogies
+et,4,mass21,,,4
+r,11,m_1m				!motor coach mass
+r,12,m_2m  				!motor bogie frame
+r,13,m_3m				!motor bogie wheelsets
+r,14,m_1t				!trailer coach mass
+r,15,m_2t				!trailer bogie frame
+r,16,m_3t				!trailer bogie wheelsets
+
+!define spring-damper
+et,5,combin14,,2
+r,21,k_pm,c_pm			!motor bogie primary suspension
+r,22,k_sm,c_sm			!motor bogie secondary suspension
+r,23,k_pt,c_pt			!trailer bogie primary suspension
+r,24,k_st,c_st			!trailer bogie secondary suspension
+
+!******************************************************************
+!place keypoints and lines and attach properties
+!girder
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+!cur_max = 24
+lsel,none
+*do,i,1,nng
+	*if,cur_max,eq,0,then
+		k,1,(i-1)*dl2,0,0
+		cur_max = 2
+	*elseif,i,eq,1,then
+		k,cur_max,(i-1)*dl2,0,0
+		cur_max = cur_max + 1
+	*else
+		k,cur_max,(i-1)*dl2,0,0
+		l,cur_max-1,cur_max
+		cur_max = cur_max + 1
+	*endif
+*enddo
+
+latt,2,2,2										!associate selected lines with material 2, real constant set 2 and element type 2
+lsel,none
+
+key_end = kp(l,0,0)								!get highest keypoint of girder
+
+!arch and hangers
+*do,i,1,nh
+	cur_x = i*l_sp								!current x position of hanger
+	cur_y = 0.647585*cur_x-0.00419366*cur_x**2	!current y position of hanger
+	*get,maxkey,kp,,num,max						!current maximum keypoint number
+	k,maxkey+1,cur_x,cur_y,0					!arch keypoint
+	lsel,none
+	*if,i,eq,1,then
+		key_one = kp(node_one,0,0)
+		l,key_one,maxkey+1						!first arch segment from start girder to maxkey
+		latt,1,1,1								!associate selected lines with material 1, real constant set 1 and element type 1
+	*elseif,i,eq,nh,then
+		l,maxkey-1,maxkey+1
+		l,maxkey+1,key_end						!last arch segment from keypoint to key_end
+		latt,1,1,1
+	*else
+		l,maxkey-1,maxkey+1						!other arch segments, fromline from previous keypoint to current
+		latt,1,1,1
+	*endif
+	lsel,none
+	kb1 = maxkey + 2							!define orientation keypoint number
+	k,kb1,cur_x,0,10								!create orientation keypoint
+	key_gir = kp(cur_x,0,0)						!keypoint number, bottom of current hanger
+	l,key_gir,maxkey+1							!hanger line
+	latt,3,3,3,,kb1								!associate selected lines with material 1, real constant set 3 and element type 3
+*enddo
+
+lsel,all
+
+!******************************************************************
+!meshing
+!girder
+lsel,s,type,,2			!select all lines of element type 2
+lesize,all,,,1			!number of element divisions per line
+lmesh,all				!generate nodes and line elements along all selected lines
+
+!arch
+lsel,s,type,,1			!select all lines of element type 1
+lesize,all,,,3			!number of element divisions per line
+lmesh,all				!generate nodes and line elements along all selected lines
+
+!hangers
+lsel,s,type,,3			!select all lines of element type 3
+lesize,all,,,3			!number of element divisions per line
+!lesize,all,,,1			!only one for link8 element
+lmesh,all				!generate nodes and line elements along all selected lines
+
+!bogies
+*do,i,1,nv
+	!bogies 1,2,5,6,11 and 12 at motor coaches, the rest trailer coaches
+	*if,i,eq,1,or,i,eq,2,then
+		!place motor bogies
+		type,4
+		real,11
+		n,(10000*i+2),i,30.5		!upper mass
+		e,(10000*i+2)
+	*elseif,i,eq,5,or,i,eq,6,then
+		!place motor bogies
+		type,4
+		real,11
+		n,(10000*i+2),i,30.5		!upper mass
+		e,(10000*i+2)
+	*elseif,i,eq,11,or,i,eq,12,then
+		!place motor bogies
+		type,4
+		real,11
+		n,(10000*i+2),i,30.5		!upper mass
+		e,(10000*i+2)
+	*else
+		!place trailer bogies
+		type,4
+		real,14
+		n,(10000*i+2),i,30.5		!upper mass
+		e,(10000*i+2)
+	*endif
+	!bogies 2,6 and 11 are motor bogies, the rest are trailer bogies
+	*if,i,eq,2,or,i,eq,6,then
+		!place motor bogies
+		type,4
+		real,13
+		n,(10000*i+1),i,30			!lower mass
+		e,(10000*i+1)
+		!place spring-dampers
+		type,5
+		real,21
+		en,(10000*i+2),(10000*i+2),(10000*i+1)
+	*elseif,i,eq,11,then
+		!place motor bogies
+		type,4
+		real,13
+		n,(10000*i+1),i,30			!lower mass
+		e,(10000*i+1)
+		!place spring-dampers
+		type,5
+		real,21
+		en,(10000*i+2),(10000*i+2),(10000*i+1)
+	*else
+		!place trailer bogies
+		type,4
+		real,16
+		n,(10000*i+1),i,30			!lower mass
+		e,(10000*i+1)
+		!place spring-dampers
+		type,5
+		real,23
+		en,(10000*i+2),(10000*i+2),(10000*i+1)
+	*endif
+	!constrain lower mass, all DOF
+	d,(10000*i+1),all
+*enddo
+
+	
+!******************************************************************
+!DOFs
+!bridge simply supported DOF
+nsel,s,loc,x,0			!x = 0
+nsel,r,loc,y,0			!y = 0
+d,all,ux,,,,,uy
+nsel,s,loc,x,l			!x = l
+nsel,r,loc,y,0			!y = 0
+d,all,uy
+allsel
+
+!******************************************************************
+!end of preprocessor, begin static analysis
+finish
+/solu
+antype,trans
+
+!first perform a static load step
+time,dt/1000
+timint,off			!no transient effects
+outres,all,all
+solve
+
+!******************************************************************
+!initial conditions
+t(1) = 0
+
+!bridge
+ub_mid(1)=uy(node(l/2,0,0))
+ub_25(1)=uy(node(l/4,0,0))
+
+!bogies
+*do,i,1,nv
+	uv(1,i)=uy(10000*i+2)
+	vv(1,i)=0
+	av(1,i)=0
+	ub(1,i)=0
+	vb(1,i)=0
+	ab(1,i)=0
+*enddo
+
+!now perform a transient analysis (default = full), first only apply a load at node 2
+timint,on						!include transient effects
+time,dt
+f,node_one+1,fy,-(m_1m*g+m_3t*g)
+outres,all,all
+solve
+
+!******************************************************************
+!loop over bridge
+*do,ii,node_one+1,nn_t
+	!write data to arrays
+	t(ii)=(ii-1)*dt
+	!bridge
+	ub_mid(ii)=uy(node(l/2,0,0))
+	ub_25(ii)=uy(node(l/4,0,0))
+	
+	!bogies
+	*do,i,1,nv
+		uv(ii,i)=uy(10000*i+2)
+		vv(ii,i)=vy(10000*i+2)
+		av(ii,i)=ay(10000*i+2)
+		
+		!bridge deflection under bogie is bridge node deflection, if bogie is still on beam, else zero (post approach bridge no deflection)
+		*if,bog_n(i),GE,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			ub(ii,i)=uy(bog_n(i)+1)
+			vb(ii,i)=vy(bog_n(i)+1)
+			ab(ii,i)=ay(bog_n(i)+1)
+		*else
+			ub(ii,i)=0
+			vb(ii,i)=0
+			ab(ii,i)=0
+		*endif
+	*enddo
+
+	time,ii*dt
+	fdele,all,all
+
+	!move vehicles one node
+	*do,i,1,nv
+		bog_n(i) = bog_n(i)+1
+		!if bogies reach the bridge, give them node number of start bridge, not necessarily 1
+		*if,bog_n(i),eq,0,THEN
+			bog_n(i) = node_one
+		*endif
+	*enddo
+
+	!apply contact force on beam, if bogie is already/still on beam
+	*do,i,1,nv
+		*if,bog_n(i),GT,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			!applied contact force depends on motor/trailer bogie and motor/trailer coach; there are 3 combinations
+			*if,i,eq,1,or,i,eq,5,then
+				f,bog_n(i),fy,(-m_1m*g-m_3t*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
+			*elseif,i,eq,12,then
+				f,bog_n(i),fy,(-m_1m*g-m_3t*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
+			*elseif,i,eq,2,or,i,eq,6,then
+				f,bog_n(i),fy,(-m_1m*g-m_3m*g-m_3m*ab(ii,i)+k_pm*(uv(ii,i)-ub(ii,i))+c_pm*(vv(ii,i)-vb(ii,i)))
+			*elseif,i,eq,11,then
+				f,bog_n(i),fy,(-m_1m*g-m_3m*g-m_3m*ab(ii,i)+k_pm*(uv(ii,i)-ub(ii,i))+c_pm*(vv(ii,i)-vb(ii,i)))
+			*else
+				f,bog_n(i),fy,(-m_1t*g-m_3t*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
+			*endif
+		*endif
+	*enddo
+
+	!give vehicles reaction displacement
+	*do,i,1,nv
+		d,(10000*i+1),uy,ub(ii,i)
+	*enddo
+	outres,all,all
+	solve
+*enddo
+
+!******************************************************************
+!write results to output files
+!bridge deflection
+*cfopen,0,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:defle','ction [m',']'
+(4A)
+*vwrite,'title:br','idge def','lection'
+(3A)
+*vwrite,'ub_mid',',','ub_quart'
+(3A)
+*vwrite,ub_mid(1),',',ub_25(1)
+(3(F20.16,A))
+*cfclose
+
+!bogies deflection
+*cfopen,1,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:verti','cal DOF ','[m]'
+(4A)
+*vwrite,'title:bo','gies ver','tical DO','F'
+(4A)
+*cfclose
+/nopr
+/output,1,txt,,append
+*mwrite,uv_head(1,1)
+(12A)
+*mwrite,uv(1,1),,,,,,,
+(12(F20.16',')F20.16)
+
+!bogies velocity
+*cfopen,2,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:veloc','ity [m/s',']'
+(4A)
+*vwrite,'title:bo','gies vel','ocity'
+(3A)
+*cfclose
+/nopr
+/output,2,txt,,append
+*mwrite,vv_head(1,1)
+(12A)
+*mwrite,vv(1,1),,,,,,,
+(12(F20.16',')F20.16)
+
+!bogies acceleration
+*cfopen,3,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:accel','eration ','[m/s2]'
+(4A)
+*vwrite,'title:bo','gies acc','eleratio','n'
+(4A)
+*cfclose
+/nopr
+/output,3,txt,,append
+*mwrite,av_head(1,1)
+(12A)
+*mwrite,av(1,1),,,,,,,
+(12(F20.16',')F20.16)
