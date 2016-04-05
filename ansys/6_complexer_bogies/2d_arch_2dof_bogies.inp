@@ -1,7 +1,7 @@
-!Name:			2d_arch_sdof_bogies
-!Date:			April 4, 2016
+!Name:			2d_arch_2dof_bogies
+!Date:			April 5, 2016
 !Last modified: April 5, 2016
-!Description:	2D arch bridge, with 12 SDOF bogies using correct parameters
+!Description:	2D arch bridge, with 12 2DOF bogies using correct parameters
 
 !******************************************************************
 finish
@@ -153,20 +153,25 @@ r,3,A_hanger,I_hanger,H_hanger
 
 !define bogies
 et,4,mass21,,,4
-r,11,(m_1m+m_2m)		!motor coach mass
+r,11,m_1m				!motor coach mass
+r,12,m_2m  				!motor bogie frame
 r,13,m_3m				!motor bogie wheelsets
-r,14,(m_1t+m_2t)		!trailer coach mass
+r,14,m_1t				!trailer coach mass
+r,15,m_2t				!trailer bogie frame
 r,16,m_3t				!trailer bogie wheelsets
 
 !define spring-damper
 et,5,combin14,,2
 r,21,k_pm,c_pm			!motor bogie primary suspension
+r,22,k_sm,c_sm			!motor bogie secondary suspension
 r,23,k_pt,c_pt			!trailer bogie primary suspension
+r,24,k_st,c_st			!trailer bogie secondary suspension
 
 !******************************************************************
 !place keypoints and lines and attach properties
 !girder
 *get,cur_max,kp,,num,max						!current maximum keypoint number
+!cur_max = 24
 lsel,none
 *do,i,1,nng
 	*if,cur_max,eq,0,then
@@ -236,69 +241,81 @@ lmesh,all				!generate nodes and line elements along all selected lines
 
 !bogies
 *do,i,1,nv
+	type,4
 	!bogies 1,2,5,6,11 and 12 at motor coaches, the rest trailer coaches
 	*if,i,eq,1,or,i,eq,2,then
 		!place motor bogies
-		type,4
 		real,11
-		n,(10000*i+3),i,31		!upper mass
+		n,(10000*i+3),i,31			!upper mass
 		e,(10000*i+3)
 	*elseif,i,eq,5,or,i,eq,6,then
 		!place motor bogies
-		type,4
 		real,11
-		n,(10000*i+3),i,31		!upper mass
+		n,(10000*i+3),i,31			!upper mass
 		e,(10000*i+3)
 	*elseif,i,eq,11,or,i,eq,12,then
 		!place motor bogies
-		type,4
 		real,11
-		n,(10000*i+3),i,31		!upper mass
+		n,(10000*i+3),i,31			!upper mass
 		e,(10000*i+3)
 	*else
 		!place trailer bogies
-		type,4
 		real,14
-		n,(10000*i+3),i,31		!upper mass
+		n,(10000*i+3),i,31			!upper mass
 		e,(10000*i+3)
 	*endif
 	!bogies 2,6 and 11 are motor bogies, the rest are trailer bogies
 	*if,i,eq,2,or,i,eq,6,then
 		!place motor bogies
 		type,4
+		real,12
+		n,(10000*i+2),i,30.5		!middle mass
+		e,(10000*i+2)
 		real,13
 		n,(10000*i+1),i,30			!lower mass
 		e,(10000*i+1)
 		!place spring-dampers
 		type,5
 		real,21
-		en,(10000*i+3),(10000*i+3),(10000*i+1)
+		en,(10000*i+2),(10000*i+2),(10000*i+1)	!primary suspension
+		real,22
+		en,(10000*i+3),(10000*i+3),(10000*i+2)	!secondary suspension
 	*elseif,i,eq,11,then
 		!place motor bogies
 		type,4
+		real,12
+		n,(10000*i+2),i,30.5		!middle mass
+		e,(10000*i+2)
 		real,13
 		n,(10000*i+1),i,30			!lower mass
 		e,(10000*i+1)
 		!place spring-dampers
 		type,5
 		real,21
-		en,(10000*i+3),(10000*i+3),(10000*i+1)
+		en,(10000*i+2),(10000*i+2),(10000*i+1)	!primary suspension
+		real,22
+		en,(10000*i+3),(10000*i+3),(10000*i+2)	!secondary suspension
 	*else
 		!place trailer bogies
 		type,4
+		real,15
+		n,(10000*i+2),i,30.5		!middle mass
+		e,(10000*i+2)
 		real,16
 		n,(10000*i+1),i,30			!lower mass
 		e,(10000*i+1)
 		!place spring-dampers
 		type,5
 		real,23
-		en,(10000*i+3),(10000*i+3),(10000*i+1)
+		en,(10000*i+2),(10000*i+2),(10000*i+1)	!primary suspension
+		real,24
+		en,(10000*i+3),(10000*i+3),(10000*i+2)	!secondary suspension
 	*endif
 	!constrain lower mass, all DOF
 	d,(10000*i+1),all
 *enddo
 
-	
+
 !******************************************************************
 !DOFs
 !bridge simply supported DOF
