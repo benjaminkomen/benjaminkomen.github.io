@@ -10,7 +10,7 @@ clc;
 % read data into array using third-party script
 file_name	= '3';
 file_ext	= '.txt';
-file_path	= '../matlab-data/vel_100_nv_1_ne_250/';
+file_path	= '../../graphs/matlab-data/vel_100_nv_1_ne_50/';
 input_path	= strcat(file_path, file_name, file_ext);
 [data_array,ffn,nh,SR,hl]	= txt2mat(input_path);
 
@@ -41,4 +41,4 @@ writetable(T,output_path);                      % write to file
 plot(f,P1)
 title('Single-Sided Amplitude Spectrum of acceleration')
 xlabel('f (Hz)')
-ylabel('|P1(f)|')
+ylabel('Amplitude (m)')
