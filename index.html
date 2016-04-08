@@ -1,102 +1,265 @@
 <!DOCTYPE html><!--html5-->
 <html lang="en-GB">
-	<head>
-		<meta charset="UTF-8">
-		<title>B. Komen | Homepage</title>
-	</head>
-	<body>
-	<main>
-		<section>
-		<p>For my Master's thesis, several graphs can be viewed. In the links, "v" means train velocity [km/h] and "ne" means the amount of elements between hangers.</p>
-		</section>
-		<section>
-		<h2>1 - Beam with one sprung mass</h2>
-		<p>Simply supported beam on which one sprung mass moves. Length is 25 meters, mass is 5750 kg, velocity is 100 km/h.
-		The Ansys results are compared to an analytical-numerical solution from Matlab.
-			<ul>
-				<li><a href="graphs/compare.html?ansys=vel_100_nv_1&matlab=vel_100_nv_1_ne_250">v = 100, nv = 1, ne = 250</a></li>
-				Matlab time histories + fft:
-				<ul>
-					<li><a href="graphs/fft.html?folder=vel_100_nv_1_ne_250&file=0">bridge displ fft</a></li>
-					<li><a href="graphs/fft.html?folder=vel_100_nv_1_ne_250&file=1">bogie displ fft</a></li>
-					<li><a href="graphs/fft.html?folder=vel_100_nv_1_ne_250&file=3">bogie accel fft</a></li>
-				</ul>
-				<li><a href="graphs/compare.html?ansys=vel_100_nv_1&matlab=vel_100_nv_1_ne_500">v = 100, nv = 1, ne = 500</a></li>
-				Matlab time histories + fft:
-				<ul>
-					<li><a href="graphs/fft.html?folder=vel_100_nv_1_ne_500&file=0">bridge displ fft</a></li>
-					<li><a href="graphs/fft.html?folder=vel_100_nv_1_ne_500&file=1">bogie displ fft</a></li>
-					<li><a href="graphs/fft.html?folder=vel_100_nv_1_ne_500&file=3">bogie accel fft</a></li>
-				</ul>
-			</ul>
-		</p>
-		</section>
-		<section>
-		<h2>2 - Beam with multiple sprung masses</h2>
-			<p>2 SDOF sprung masses, moving over a 75 meter long simply supported beam.
-				<ul>
-					<li><a href="graphs/ansys.html?name=vel_100_nv_2_l_75">v = 100, nv = 2, l = 75 (ansys)</a></li>
-					<li><a href="graphs/compare.html?ansys=vel_100_nv_2_l_25&matlab=vel_100_nv_2_l_25">v = 100, nv = 2, l = 25</a></li>
-					<li><a href="graphs/compare.html?ansys=vel_100_nv_2_l_50&matlab=vel_100_nv_2_l_50">v = 100, nv = 2, l = 50</a></li>
-					<li><a href="graphs/compare.html?ansys=vel_100_nv_2_l_75&matlab=vel_100_nv_2_l_75">v = 100, nv = 2, l = 75</a></li>
-				</ul>
-			</p>
-		</section>
-		<section>
-		<h2>4 - 2D Arch bridge with multiple sprung masses</h2>
-			<h3>Convergence study</h3>
-			<p>6 SDOF sprung masses, moving over a 2D tied-arch bridge.
-				<ul>
-					<li><a href="graphs/ansys.html?name=vel_160_ne_1">v = 160, ne = 1</a></li>
-					<li><a href="graphs/ansys.html?name=vel_160_ne_10">v = 160, ne = 10</a></li>
-					<li><a href="graphs/ansys.html?name=vel_160_ne_20">v = 160, ne = 20</a></li>
-					<li><a href="graphs/ansys.html?name=vel_160_ne_30">v = 160, ne = 30</a></li>
-					<li><a href="graphs/ansys.html?name=vel_160_ne_40">v = 160, ne = 40</a></li>
-					<li><a href="graphs/ansys.html?name=vel_160_ne_50">v = 160, ne = 50</a></li>
-				</ul>
-			</p>
-			
-			<h3>Number of bogies</h3>
-			<p>Setting the number of bogies to 12 (which means six coaches, the longer VIRM version).
-				<ul>
-					<li><a href="graphs/ansys.html?name=vel_160_nv_1">v = 160, nv = 1</a></li>
-					<li><a href="graphs/ansys.html?name=vel_160_nv_1_alt">v = 160, nv = 1 (direct get functions)</a></li>
-					<li><a href="graphs/ansys.html?name=vel_160_nv_2">v = 160, nv = 2</a></li>
-					<li><a href="graphs/ansys.html?name=vel_160_nv_12">v = 160, nv = 12</a></li>
-				</ul>
-			</p>
-			<h3>SDOF</h3>
-			<p>More realistic SDOF bogie data
-				<ul>
-					<li><a href="graphs/ansys.html?name=vel_125_nv_12_ne_50_sdofs">v = 125, nv = 12, ne = 50 SDOFS with trailer/coach masses</a></li>
-				</ul>
-			</p>
-			<h3>2DOF</h3>
-			<p>Using 2DOF bogies for the train
-				<ul>
-					<li><a href="graphs/ansys.html?name=vel_125_nv_12_ne_50_2dofs">v = 125, nv = 12, ne = 50; 2DOFS</a></li>
-				</ul>
-			</p>
-		</section>
-		<section>
-		<h2>5 - 3D Arch bridge with multiple sprung masses</h2>
-			<p>Now the bridge model is made 3D, still the same 12 bogies run over it.</p>
-				<ul>
-					<li><a href="graphs/ansys.html?name=bridge_3d_vel_100_nv_12">bridge = 3d, v = 100, nv = 12</a></li>
-				</ul>
-		</section>
-		<section>
-		<h2>6 - Measurements graphs</h2>
-			<p>On March 24, 2016 several trips between Utrecht and 's-Hertogenbosch were made and acceleration measurements were taken.<p>
-			<h3>Full data</h3>
-				<ul>
-					<li><a href="graphs/experiment.html">all 8 full trips</a></li>
-					<li><a href="graphs/experiment_bridge_only.html">bridge parts only</a></li>
-					<li><a href="graphs/experiment_bridge_fft.html">bridge parts fft</a></li>
-					<li><a href="graphs/experiment_nonbridge_fft.html?name=trip_2_alt">trip 2 (non bridge)</a></li>
-					<li><a href="graphs/experiment_nonbridge_fft.html?name=trip_4_alt">trip 4 (non bridge)</a></li>
-				</ul>
-		</section>
+  <head>
+    <meta charset="UTF-8">
+    <title>B. Komen | Homepage</title>
+	<style>
+	.pure-table {
+      border-collapse: collapse;
+      border-spacing: 0;
+      empty-cells: show;
+      border: 1px solid #cbcbcb;
+	}
+	.pure-table thead {
+      background-color: #e0e0e0;
+      color: #000;
+      text-align: left;
+      vertical-align: bottom;
+	}
+	.pure-table td:first-child, .pure-table th:first-child {
+      border-left-width: 0;
+	}
+	.pure-table th, .pure-table td {
+      padding: 0.5em 1em;
+	}
+	.pure-table td, .pure-table th {
+      border-left: 1px solid #cbcbcb;
+      border-width: 0 0 0 1px;
+      font-size: inherit;
+      margin: 0;
+      overflow: visible;
+      padding: .5em 1em;
+	}
+	.mid-header {
+	  background-color: #ADD8E6;
+	}
+	</style>
+  </head>
+  <body>
+    <header>
+    <p>For my Master's thesis, several analyses are run, from which the graphical output can be seen in several graphs. This page contains a table which links to the various graphs.</p>
+    </header>
+    <main>
+      <section>
+        <table class="pure-table">
+		  <thead>
+			<tr>
+			  <th>Name</th>
+			  <th>Velocity [km/h]</th>
+			  <th># bogies</th>
+			  <th># bridge elements</th>
+			  <th>Description</th>
+			</tr>
+		  </thead>
+		  <tbody>
+			<tr>
+			  <th class="mid-header" colspan="5">Simply supported beam with SDOF sprung mass</th>
+			</tr>
+		    <tr>
+			  <td><a href="graphs/compare.html?ansys=vel_100_nv_1&matlab=vel_100_nv_1_ne_100">beam with one sprung mass</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>100</td>
+			  <td>25 meter beam with 5750 kg mass. Ansys results compared to Matlab.</td>
+			</tr>
+			<tr>
+			  <td>&nbsp; &nbsp; <a href="graphs/fft.html?folder=vel_100_nv_1_ne_100&file=0">bridge displ fft</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>100</td>
+			  <td>Matlab time histories + fft</td>
+			</tr>
+			<tr>
+			  <td>&nbsp; &nbsp; <a href="graphs/fft.html?folder=vel_100_nv_1_ne_100&file=1">bogie displ fft</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>100</td>
+			  <td>Matlab time histories + fft</td>
+			</tr>
+			<tr>
+			  <td>&nbsp; &nbsp; <a href="graphs/fft.html?folder=vel_100_nv_1_ne_100&file=3">bogie accel fft</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>100</td>
+			  <td>Matlab time histories + fft</td>
+			</tr>
+		    <tr>
+			  <td><a href="graphs/compare.html?ansys=vel_100_nv_1&matlab=vel_100_nv_1_ne_250">beam with one sprung mass</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>250</td>
+			  <td>25 meter beam with 5750 kg mass. Ansys results compared to Matlab.</td>
+			</tr>
+			<tr>
+			  <td>&nbsp; &nbsp; <a href="graphs/fft.html?folder=vel_100_nv_1_ne_250&file=0">bridge displ fft</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>250</td>
+			  <td>Matlab time histories + fft</td>
+			</tr>
+			<tr>
+			  <td>&nbsp; &nbsp; <a href="graphs/fft.html?folder=vel_100_nv_1_ne_250&file=1">bogie displ fft</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>250</td>
+			  <td>Matlab time histories + fft</td>
+			</tr>
+			<tr>
+			  <td>&nbsp; &nbsp; <a href="graphs/fft.html?folder=vel_100_nv_1_ne_250&file=3">bogie accel fft</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>250</td>
+			  <td>Matlab time histories + fft</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/compare.html?ansys=vel_100_nv_1&matlab=vel_100_nv_1_ne_500">beam with one sprung mass</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>500</td>
+			  <td>25 meter beam with 5750 kg mass. Ansys results compared to Matlab.</td>
+			</tr>
+			<tr>
+			  <td>&nbsp; &nbsp; <a href="graphs/fft.html?folder=vel_100_nv_1_ne_500&file=0">bridge displ fft</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>500</td>
+			  <td>Matlab time histories + fft</td>
+			</tr>
+			<tr>
+			  <td>&nbsp; &nbsp; <a href="graphs/fft.html?folder=vel_100_nv_1_ne_500&file=1">bogie displ fft</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>500</td>
+			  <td>Matlab time histories + fft</td>
+			</tr>
+			<tr>
+			  <td>&nbsp; &nbsp; <a href="graphs/fft.html?folder=vel_100_nv_1_ne_500&file=3">bogie accel fft</a></td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>500</td>
+			  <td>Matlab time histories + fft</td>
+			</tr>
+			<tr>
+			  <th class="mid-header" colspan="5">Simply supported beam with multiple sprung masses</th>
+			</tr>
+		    <tr>
+			  <td><a href="graphs/ansys.html?name=vel_100_nv_2_l_25">Ansys</a> + 
+			      <a href="graphs/compare.html?ansys=vel_100_nv_2_l_25&matlab=vel_100_nv_2_l_25">compared to matlab</a>
+			  </td>
+			  <td>100</td>
+			  <td>2</td>
+			  <td>?</td>
+			  <td>25 meter beam with two 5750 kg masses. Ansys results and compared to Matlab.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys.html?name=vel_100_nv_2_l_50">Ansys</a> + 
+			      <a href="graphs/compare.html?ansys=vel_100_nv_2_l_50&matlab=vel_100_nv_2_l_50">compared to matlab</a>
+			  </td>
+			  <td>100</td>
+			  <td>2</td>
+			  <td>?</td>
+			  <td>50 meter beam with two 5750 kg masses. Ansys results and compared to Matlab.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys.html?name=vel_100_nv_2_l_75">Ansys</a> + 
+			      <a href="graphs/compare.html?ansys=vel_100_nv_2_l_75&matlab=vel_100_nv_2_l_75">compared to matlab</a>
+			  </td>
+			  <td>100</td>
+			  <td>2</td>
+			  <td>?</td>
+			  <td>75 meter beam with two 5750 kg masses. Ansys results and compared to Matlab.</td>
+			</tr>
+			<tr>
+			  <th class="mid-header" colspan="5">2D Arch bridge with multiple sprung masses</th>
+			</tr>
+		    <tr>
+			  <td><a href="graphs/ansys.html?name=vel_160_ne_1">ne = 1</a>, 
+			      <a href="graphs/ansys.html?name=vel_160_ne_10">ne = 10</a>, 
+				  <a href="graphs/ansys.html?name=vel_160_ne_20">ne = 20</a>, 
+				  <a href="graphs/ansys.html?name=vel_160_ne_30">ne = 30</a>, 
+				  <a href="graphs/ansys.html?name=vel_160_ne_40">ne = 40</a> and 
+				  <a href="graphs/ansys.html?name=vel_160_ne_50">ne = 50</a>  
+			  </td>
+			  <td>160</td>
+			  <td>6</td>
+			  <td>1 - 50h*</td>
+			  <td>154 meter 2d arch bridge with sprung masses in Ansys. Note: bridge elements are actually elements between hangers, not total.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys.html?name=vel_160_nv_1">numerical differentiated</a> or 
+			      <a href="graphs/ansys.html?name=vel_160_nv_1_alt">direct get functions</a>
+			  </td>
+			  <td>160</td>
+			  <td>1</td>
+			  <td>?</td>
+			  <td>154 meter 2d arch bridge with sprung mass in Ansys.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys.html?name=vel_160_nv_2">two bogies</a></td>
+			  <td>160</td>
+			  <td>2</td>
+			  <td>?</td>
+			  <td>154 meter 2d arch bridge with sprung mass in Ansys. Note: old and wrong train properties.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys.html?name=vel_160_nv_12">twelve bogies</a></td>
+			  <td>160</td>
+			  <td>12</td>
+			  <td>?</td>
+			  <td>154 meter 2d arch bridge with sprung mass in Ansys. Note: old and wrong train properties.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys.html?name=vel_125_nv_12_ne_50_sdofs">twelve sdofs</a></td>
+			  <td>125</td>
+			  <td>12</td>
+			  <td>50h</td>
+			  <td>154 meter 2d arch bridge with SDOF sprung masses in Ansys. SDOFS with correct trailer/coach masses.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys.html?name=vel_125_nv_12_ne_50_2dofs">twelve 2dofs</a></td>
+			  <td>125</td>
+			  <td>12</td>
+			  <td>50h</td>
+			  <td>154 meter 2d arch bridge with 2DOF sprung masses in Ansys.</td>
+			</tr>
+			<tr>
+			  <th class="mid-header" colspan="5">3D Arch bridge with multiple sprung masses</th>
+			</tr>
+		    <tr>
+			  <td><a href="graphs/ansys.html?name=bridge_3d_vel_100_nv_12">3d bridge, 12 bogies</a></td>
+			  <td>100</td>
+			  <td>12</td>
+			  <td>?</td>
+			  <td>154 meter 3d arch bridge with SDOF sprung masses in Ansys. Still old bogie properties.</td>
+			</tr>
+			<tr>
+			  <th class="mid-header" colspan="5">Kuilenburgse spoorbrug measurements on March 24, 2016.</th>
+			</tr>
+		    <tr>
+			  <td><a href="graphs/experiment.html">all 8 full trips</a></td>
+			  <td>-</td>
+			  <td>-</td>
+			  <td>-</td>
+			  <td>Full experiment data.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/experiment_bridge_only.html">bridge parts only</a> +
+			      <a href="graphs/experiment_bridge_fft.html">fast fourier transform</a></td>
+			  <td>-</td>
+			  <td>-</td>
+			  <td>-</td>
+			  <td>Zoomed in on bridge parts and fast fourier transform.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/experiment_nonbridge_fft.html?name=trip_2_alt">trip 2 (non bridge)</a> +
+			      <a href="graphs/experiment_nonbridge_fft.html?name=trip_4_alt">trip 4 (non bridge)</a></td>
+			  <td>-</td>
+			  <td>-</td>
+			  <td>-</td>
+			  <td>Two measurements on track, not part of the bridge + fast fourier transforms.</td>
+			</tr>
+		  </tbody>
+		</table>
 	</main>
 	<footer style="height: 50px;">
 		<span style="font-size: smaller;">Last updated: April 8, 2016</span>
