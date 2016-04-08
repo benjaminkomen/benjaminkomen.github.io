@@ -171,7 +171,7 @@
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
-			  <th class="mid-header" colspan="6">Simply supported beam with multiple sprung masses</th>
+			  <th class="mid-header" colspan="6">Simply supported beam with multiple SDOF sprung masses</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/ansys.html?name=vel_100_nv_2_l_25">Ansys</a> + 
@@ -213,7 +213,7 @@
 			  <td>75 meter beam with two 5750 kg masses. Ansys results and compared to Matlab.</td>
 			</tr>
 			<tr>
-			  <th class="mid-header" colspan="6">2D Arch bridge with multiple sprung masses</th>
+			  <th class="mid-header" colspan="6">2D Arch bridge with multiple SDOF sprung masses</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/ansys.html?name=vel_160_ne_1">ne = 1</a>, 
@@ -273,7 +273,7 @@
 			  <td>154 meter 2d arch bridge with 2DOF sprung masses in Ansys.</td>
 			</tr>
 			<tr>
-			  <th class="mid-header" colspan="6">3D Arch bridge with multiple sprung masses</th>
+			  <th class="mid-header" colspan="6">3D Arch bridge with multiple SDOF sprung masses</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/ansys.html?name=bridge_3d_vel_100_nv_12">3d bridge, 12 bogies</a></td>
@@ -284,7 +284,7 @@
 			  <td>154 meter 3d arch bridge with SDOF sprung masses in Ansys. Still old bogie properties.</td>
 			</tr>
 			<tr>
-			  <th class="mid-header" colspan="6">Kuilenburgse spoorbrug measurements on March 24, 2016.</th>
+			  <th class="mid-header" colspan="6">Kuilenburgse spoorbrug measurements on March 24, 2016</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/experiment.html">all 8 full trips</a></td>
@@ -311,6 +311,36 @@
 			  <td>-</td>
 			  <td><a href="matlab/fft/fft_script_experiment_input.m">matlab fft</a></td>
 			  <td>Two measurements on track, not part of the bridge + fast fourier transforms.</td>
+			</tr>
+			<tr>
+			  <th class="mid-header" colspan="6">Simply supported beam with various train models</th>
+			</tr>
+		    <tr>
+			  <td><a href="graphs/ansys.html?name=beam_1_dof_bogie">Ansys</a>
+			  </td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>250</td>
+			  <td><a href="ansys/6_complexer_bogies/beam_1_dof_bogie.inp">ansys</a></td>
+			  <td>25 meter beam with a SDOF sprung mass: 0.5*43500 kg vehicle mass and 8370 bogie mass.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys.html?name=beam_2_dof_bogie">Ansys</a>
+			  </td>
+			  <td>100</td>
+			  <td>1</td>
+			  <td>250</td>
+			  <td><a href="ansys/6_complexer_bogies/beam_2_dof_bogie.inp">ansys</a></td>
+			  <td>25 meter beam with a 2DOF sprung mass: a 0.5*43500 kg vehicle mass, a 4970 kg frame mass and a 2*1700 kg wheel mass.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys.html?name=beam_4_dof_coach">Ansys</a>
+			  </td>
+			  <td>100</td>
+			  <td>2</td>
+			  <td>250</td>
+			  <td><a href="ansys/6_complexer_bogies/beam_4_dof_coach.inp">ansys</a></td>
+			  <td>25 meter beam with 4DOF coach: a 43500 kg vehicle mass, two 4970 kg frame masses and two 2*1700 kg wheel masses.</td>
 			</tr>
 		  </tbody>
 		</table>

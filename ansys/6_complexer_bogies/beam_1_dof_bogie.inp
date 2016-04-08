@@ -1,0 +1,203 @@
+!Name:			beam_1_dof_bogie
+!Date:			February 9, 2016
+!Last modified: March 31, 2016
+!Description:	Simply supported beam with one SDOF sprung mass
+
+!******************************************************************
+finish
+/clear
+/prep7
+
+!define some input variables
+l		= 25					!length bridge [m]
+g		= 9.81					!gravitational acceleration [m/s2]
+m1		= 0.5*43500				!vehicle mass [kg]
+m2		= 8370					!wheel mass [kg]
+k1		= 3400000				!spring stiffness [N/m]
+c1		= 64996					!damping value [Ns/m]
+E_b		= 2.87e9				!Youngs modulus [N/m^2]
+mu		= 0.2					!poissons ratio [-]
+A_b		= 4.52					!Area beam [m^2]
+m_b		= (2303/A_b)			!mass density 2303/4.52 [kg/m^3]
+h_b		= 2.77					!height beam [m]
+w_b		= (A_b/h_b)				!width beam [m]
+Izz		= 2.887					!Moment of inertia beam [m^4]
+ne		= 250					!number of elements
+nn		= ne + 1				!number of nodes
+v		= 100/3.6	 			!velocity [m/s]
+dl		= l / ne				!delta length of small element
+dt		= dl / v  				!delta time of one time step
+nv		= 1						!number of travelling sprung masses
+nn_t    = 2*nn					!array dimension counter
+
+!******************************************************************
+!define the dimension of some output variables
+!bridge
+*dim,ub_mid,,nn_t				!displacement bridge midspan
+
+!masses
+*dim,uv,,nn_t					!displacement bogie
+*dim,vv,,nn_t					!velocity bogie
+*dim,av,,nn_t					!acceleration bogie
+*dim,ub,,nn_t					!displacement bridge
+*dim,vb,,nn_t					!velocity bridge
+*dim,ab,,nn_t					!acceleration bridge
+
+!******************************************************************
+!define material types
+!masses
+et,1,mass21,,,4
+r,11,m1				!vehicle mass
+r,12,m2  			!wheel mass
+
+!spring-damper
+et,2,combin14,,2
+r,21,k1,c1			!spring and damper values
+
+!beam
+et,3,beam3
+mp,ex,3,E_b
+mp,nuxy,3,mu
+mp,dens,3,m_b
+r,3,A_b,Izz,h_b
+
+!******************************************************************
+!mesh nodes and elements
+!vehicle: two mass elements
+type,1
+real,11
+n,1002,10,1.5		!X = 10, Y = 1.5
+e,1002
+real,12
+n,1001,10,1			!X = 10, Y = 1
+e,1001
+
+!spring-damper element, connecting both masses
+type,2
+real,21
+en,1002,1002,1001
+
+!bridge nodes
+*do,i,1,nn
+n,i,(i-1)*dl
+*enddo
+
+!bridge elements
+type,3
+real,3
+mat,3
+secnum,3
+*do,i,1,ne
+e,i,i+1
+*enddo
+
+!******************************************************************
+!constrain degrees of freedom
+d,1,ux,,,,,uy
+d,nn,uy
+d,1001,all
+
+!******************************************************************
+!start transient analysis mode
+finish
+/solu
+antype,trans
+
+!first perform a static analysis load step, to define initial displacement
+time,dt/1000
+timint,off			!no transient effects
+solve
+
+uv(1)=uy(1002)
+vv(1)=0
+av(1)=0
+ub(1)=0
+vb(1)=0
+ab(1)=0
+ub_mid(1)=uy(node(l/2,0,0))
+
+!now perform a full transient analysis, first only apply a load at node 2
+timint,on						!include transient effects
+time,dt
+f,2,fy,-(m1*g+m2*g)
+solve
+
+!loop over bridge, move vehicle step by step and compute solution for every step
+*do,ii,2,nn_t
+	uv(ii)=uy(1002)
+	vv(ii)=(uv(ii)-uv(ii-1))/dt
+	av(ii)=(vv(ii)-vv(ii-1))/dt
+	ub(ii)=uy(ii+1)
+	vb(ii)=(ub(ii)-ub(ii-1))/dt
+	ab(ii)=(vb(ii)-vb(ii-1))/dt
+	ub_mid(ii)=uy(node(l/2,0,0))
+	time,ii*dt
+	fdele,all,all
+	f,ii+1,fy,(-m1*g-m2*g-m2*ab(ii)+k1*(uv(ii)-ub(ii))+c1*(vv(ii)-vb(ii)))
+	d,1001,uy,ub(ii)
+	solve
+*enddo
+
+!******************************************************************
+!write results to output files
+!bridge deflection
+*cfopen,0,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:defle','ction [m',']'
+(4A)
+*vwrite,'title:br','idge def','lection'
+(3A)
+*vwrite,'ub_mid'
+(1A)
+*vwrite,ub_mid(1)
+(F20.16)
+*cfclose
+
+!bogies deflection
+*cfopen,1,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:verti','cal DOF ','[m]'
+(4A)
+*vwrite,'title:bo','gies ver','tical DO','F'
+(4A)
+*vwrite,'uv1'
+(1A)
+*cfclose
+/nopr
+/output,1,txt,,append
+*mwrite,uv(1)
+(F20.16)
+
+!bogies velocity
+*cfopen,2,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:veloc','ity [m/s',']'
+(4A)
+*vwrite,'title:bo','gies vel','ocity'
+(3A)
+*vwrite,'vv1'
+(1A)
+*cfclose
+/nopr
+/output,2,txt,,append
+*mwrite,vv(1)
+(F20.16)
+
+!bogies acceleration
+*cfopen,3,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:accel','eration ','[m/s2]'
+(4A)
+*vwrite,'title:bo','gies acc','eleratio','n'
+(4A)
+*vwrite,'av1'
+(1A)
+*cfclose
+/nopr
+/output,3,txt,,append
+*mwrite,av(1)
+(F20.16)

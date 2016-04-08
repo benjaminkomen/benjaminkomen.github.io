@@ -1,0 +1,285 @@
+!Name:			beam_4_dof_coach
+!Date:			April 6, 2016
+!Last modified: April 6, 2016
+!Description:	simply supported beam with a 4DOF coach
+
+!******************************************************************
+finish
+/clear
+/prep7
+
+!define some input variables
+l		= 25					!length bridge [m]
+g		= 9.81					!gravitational acceleration [m/s2]
+m1		= 43000					!vehicle mass [kg]
+m2		= 4970					!frame mass [kg]
+m3 		= 2*1700				!mass 2 wheelsets [kg]
+m4 		= 1e-8					!dummy mass [kg]
+k1		= 3400000				!spring stiffness [N/m]
+k2		= 920000				!spring stiffness [N/m]
+c1		= 64996					!damping value [Ns/m]
+c2		= 75829					!damping value [Ns/m]
+E_b		= 2.87e9				!Youngs modulus [N/m^2]
+mu		= 0.2					!poissons ratio [-]
+A_b		= 4.52					!Area beam [m^2]
+m_b		= (2303/A_b)			!mass density 2303/4.52 [kg/m^3]
+h_b		= 2.77					!height beam [m]
+w_b		= (A_b/h_b)				!width beam [m]
+Izz		= 2.887					!Moment of inertia beam [m^4]
+ne		= 250					!number of elements
+nn		= ne + 1				!number of nodes
+v		= 100/3.6	 			!velocity [m/s]
+dl		= l / ne				!delta length of small element
+dt		= dl / v  				!delta time of one time step
+node_one 	= 1						!number of first node where bogies move
+node_end 	= nn					!number of last node where bogies move
+
+nv			= 2					!number of bogies
+*dim,bog_x,,nv						!bogies initial x-coordinate positions array
+bog_x(1) 	= 0
+bog_x(2) 	= -8
+
+*dim,bog_n,,nv						!bogies initial node positions array
+bog_n(1) 	= 2						!node number of bogie 1
+bog_n(2) 	= nint(bog_x(2)/dl)
+
+nn_t	= 2*nn+abs(bog_n(%nv%))+1		!array dimension counter
+
+!******************************************************************
+!define the dimension of some output variables
+!bridge
+*dim,ub_mid,,nn_t				!displacement bridge midspan
+
+!masses
+*dim,uv,,nn_t,nv				!displacement bogie
+*dim,vv,,nn_t,nv				!velocity bogie
+*dim,av,,nn_t,nv				!acceleration bogie
+*dim,ub,,nn_t,nv				!displacement bridge
+*dim,vb,,nn_t,nv				!velocity bridge
+*dim,ab,,nn_t,nv				!acceleration bridge
+
+!******************************************************************
+!define material types
+!masses
+et,1,mass21,,,4
+r,11,m1				!vehicle mass
+r,12,m2  			!frame mass
+r,13,m3				!wheel mass
+r,14,m4				!dummy mass
+
+!spring-damper
+et,2,combin14,,2
+r,21,k1,c1			!spring and damper values
+r,22,k2,c2
+
+!beam
+et,3,beam3
+mp,ex,3,E_b
+mp,nuxy,3,mu
+mp,dens,3,m_b
+r,3,A_b,Izz,h_b
+
+!******************************************************************
+!mesh nodes and elements
+!wheels
+type,1
+real,13
+n,1001,10,1			!X = 10, Y = 1
+e,1001
+n,2001,18,1			!X = 18, Y = 1
+e,2001
+!frames
+real,12
+n,1002,10,1.5		!X = 10, Y = 1.5
+e,1002
+n,2002,18,1.5		!X = 18, Y = 1.5
+e,2002
+!dummy masses
+real,14
+n,1003,10,2			!X = 10, Y = 2
+e,1003
+n,2003,18,2			!X = 18, Y = 2
+e,2003
+!coach mass
+real,11
+n,1004,14,2
+e,1004
+
+!connect dummy and coach mass
+cerig,1004,1003,uxyz
+cerig,1004,2003,uxyz
+
+!spring-damper element, connecting both masses
+type,2
+real,21
+en,1002,1002,1001
+en,2002,2002,2001
+real,22
+en,1003,1003,1002
+en,2003,2003,2002
+
+!bridge nodes
+*do,i,1,nn
+n,i,(i-1)*dl
+*enddo
+
+!bridge elements
+type,3
+real,3
+mat,3
+secnum,3
+*do,i,1,ne
+e,i,i+1
+*enddo
+
+!******************************************************************
+!constrain degrees of freedom
+d,1,ux,,,,,uy
+d,nn,uy
+d,1001,all
+d,2001,all
+
+!******************************************************************
+!start transient analysis mode
+finish
+/solu
+antype,trans
+
+!first perform a static analysis load step, to define initial displacement
+time,dt/1000
+timint,off			!no transient effects
+outres,all,all
+solve
+
+ub_mid(1)=uy(node(l/2,0,0))
+
+!bogies
+*do,i,1,nv
+	uv(1,i)=uy(1000*i+3)
+	vv(1,i)=0
+	av(1,i)=0
+	ub(1,i)=0
+	vb(1,i)=0
+	ab(1,i)=0
+*enddo
+
+!now perform a full transient analysis, first only apply a load at node 2
+timint,on						!include transient effects
+time,dt
+f,2,fy,-((m1+m2+m3)*g)
+outres,all,all
+solve
+
+!loop over bridge, move vehicle step by step and compute solution for every step
+*do,ii,2,nn_t
+	ub_mid(ii)=uy(node(l/2,0,0))
+	
+	!bogies
+	*do,i,1,nv
+		uv(ii,i)=uy(1000*i+3)
+		vv(ii,i)=vy(1000*i+3)
+		av(ii,i)=ay(1000*i+3)
+		
+		!bridge deflection under bogie is bridge node deflection, if bogie is still on beam, else zero (post approach bridge no deflection)
+		*if,bog_n(i),GE,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			ub(ii,i)=uy(bog_n(i)+1)
+			vb(ii,i)=vy(bog_n(i)+1)
+			ab(ii,i)=ay(bog_n(i)+1)
+		*else
+			ub(ii,i)=0
+			vb(ii,i)=0
+			ab(ii,i)=0
+		*endif
+	*enddo
+	
+	time,ii*dt
+	fdele,all,all
+	
+	!move vehicles one node
+	*do,i,1,nv
+		bog_n(i) = bog_n(i)+1
+		!if bogies reach the bridge, give them node number of start bridge, not necessarily 1
+		*if,bog_n(i),eq,0,THEN
+			bog_n(i) = node_one
+		*endif
+	*enddo
+	
+	!apply contact force on beam, if bogie is already/still on beam
+	*do,i,1,nv
+		*if,bog_n(i),GT,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			!applied contact force depends on motor/trailer bogie and motor/trailer coach; there are 3 combinations
+			f,bog_n(i),fy,(-((0.5*m1+m2+m3)*g)-m3*ab(ii)+k1*(uv(ii)-ub(ii))+c1*(vv(ii)-vb(ii)))
+		*endif
+	*enddo
+
+	!give vehicles reaction displacement
+	*do,i,1,nv
+		d,(1000*i+1),uy,ub(ii,i)
+	*enddo
+	outres,all,all
+	solve
+*enddo
+
+!******************************************************************
+!write results to output files
+!bridge deflection
+*cfopen,0,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:defle','ction [m',']'
+(4A)
+*vwrite,'title:br','idge def','lection'
+(3A)
+*vwrite,'ub_mid'
+(1A)
+*vwrite,ub_mid(1)
+(F20.16)
+*cfclose
+
+!bogies deflection
+*cfopen,1,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:verti','cal DOF ','[m]'
+(4A)
+*vwrite,'title:bo','gies ver','tical DO','F'
+(4A)
+*vwrite,'uv1'
+(1A)
+*cfclose
+/nopr
+/output,1,txt,,append
+*mwrite,uv(1)
+(F20.16)
+
+!bogies velocity
+*cfopen,2,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:veloc','ity [m/s',']'
+(4A)
+*vwrite,'title:bo','gies vel','ocity'
+(3A)
+*vwrite,'vv1'
+(1A)
+*cfclose
+/nopr
+/output,2,txt,,append
+*mwrite,vv(1)
+(F20.16)
+
+!bogies acceleration
+*cfopen,3,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:accel','eration ','[m/s2]'
+(4A)
+*vwrite,'title:bo','gies acc','eleratio','n'
+(4A)
+*vwrite,'av1'
+(1A)
+*cfclose
+/nopr
+/output,3,txt,,append
+*mwrite,av(1)
+(F20.16)
