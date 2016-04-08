@@ -37,7 +37,10 @@
   </head>
   <body>
     <header>
-    <p>For my Master's thesis, several analyses are run, from which the graphical output can be seen in several graphs. This page contains a table which links to the various graphs.</p>
+    <p>For my Master's thesis, several analyses are run, from which the graphical output can be seen in several graphs.
+	   This page contains a table which links to the various graphs.<br />
+	   All scripts and input data can be viewed <a href="https://github.com/benjaminkomen/benjaminkomen.github.io">on github</a> as well.
+	</p>
     </header>
     <main>
       <section>
@@ -48,18 +51,25 @@
 			  <th>Velocity [km/h]</th>
 			  <th># bogies</th>
 			  <th># bridge elements</th>
+			  <th>Script</th>
 			  <th>Description</th>
 			</tr>
 		  </thead>
 		  <tbody>
 			<tr>
-			  <th class="mid-header" colspan="5">Simply supported beam with SDOF sprung mass</th>
+			  <th class="mid-header" colspan="6">Simply supported beam with SDOF sprung mass</th>
 			</tr>
 		    <tr>
-			  <td><a href="graphs/compare.html?ansys=vel_100_nv_1&matlab=vel_100_nv_1_ne_100">beam with one sprung mass</a></td>
+			   <td><a href="graphs/ansys.html?name=vel_100_nv_1">Ansys</a> + 
+			      <a href="graphs/compare.html?ansys=vel_100_nv_1&matlab=vel_100_nv_1_ne_100">compared to matlab</a>
+			  </td>
 			  <td>100</td>
 			  <td>1</td>
 			  <td>100</td>
+			  <td><a href="ansys/1_beam_contact_force_model/beam_1_sprung_mass.inp">ansys</a> + 
+			      <a href="matlab/one_sprung_mass/sdof_mov_sprung_mass.m">matlab 1</a>,
+				  <a href="matlab/one_sprung_mass/odesolver.m">matlab 2</a>
+			  </td>
 			  <td>25 meter beam with 5750 kg mass. Ansys results compared to Matlab.</td>
 			</tr>
 			<tr>
@@ -67,6 +77,7 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>100</td>
+			  <td><a href="matlab/fft/fft_script_matlab_input.m">matlab fft</a></td>
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
@@ -74,6 +85,7 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>100</td>
+			  <td><a href="matlab/fft/fft_script_matlab_input.m">matlab fft</a></td>
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
@@ -81,6 +93,7 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>100</td>
+			  <td><a href="matlab/fft/fft_script_matlab_input.m">matlab fft</a></td>
 			  <td>Matlab time histories + fft</td>
 			</tr>
 		    <tr>
@@ -88,6 +101,10 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>250</td>
+			  <td><a href="ansys/1_beam_contact_force_model/beam_1_sprung_mass.inp">ansys</a> + 
+			      <a href="matlab/one_sprung_mass/sdof_mov_sprung_mass.m">matlab 1</a>,
+				  <a href="matlab/one_sprung_mass/odesolver.m">matlab 2</a>
+			  </td>
 			  <td>25 meter beam with 5750 kg mass. Ansys results compared to Matlab.</td>
 			</tr>
 			<tr>
@@ -95,6 +112,7 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>250</td>
+			  <<td><a href="matlab/fft/fft_script_matlab_input.m">matlab fft</a></td>
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
@@ -102,6 +120,7 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>250</td>
+			  <td><a href="matlab/fft/fft_script_matlab_input.m">matlab fft</a></td>
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
@@ -109,6 +128,7 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>250</td>
+			  <td><a href="matlab/fft/fft_script_matlab_input.m">matlab fft</a></td>
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
@@ -116,6 +136,10 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>500</td>
+			  <td><a href="ansys/1_beam_contact_force_model/beam_1_sprung_mass.inp">ansys</a> + 
+			      <a href="matlab/one_sprung_mass/sdof_mov_sprung_mass.m">matlab 1</a>,
+				  <a href="matlab/one_sprung_mass/odesolver.m">matlab 2</a>
+			  </td>
 			  <td>25 meter beam with 5750 kg mass. Ansys results compared to Matlab.</td>
 			</tr>
 			<tr>
@@ -123,6 +147,7 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>500</td>
+			  <td><a href="matlab/fft/fft_script_matlab_input.m">matlab fft</a></td>
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
@@ -130,6 +155,7 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>500</td>
+			  <td><a href="matlab/fft/fft_script_matlab_input.m">matlab fft</a></td>
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
@@ -137,10 +163,11 @@
 			  <td>100</td>
 			  <td>1</td>
 			  <td>500</td>
+			  <td><a href="matlab/fft/fft_script_matlab_input.m">matlab fft</a></td>
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
-			  <th class="mid-header" colspan="5">Simply supported beam with multiple sprung masses</th>
+			  <th class="mid-header" colspan="6">Simply supported beam with multiple sprung masses</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/ansys.html?name=vel_100_nv_2_l_25">Ansys</a> + 
@@ -149,6 +176,10 @@
 			  <td>100</td>
 			  <td>2</td>
 			  <td>?</td>
+			  <td><a href="ansys/2_beam_multiple_sprung_masses/beam_2_sprung_masses.inp">ansys</a> + 
+			      <a href="matlab/multiple_sprung_masses/mult_sdof_sprung_masses.m">matlab 1</a>,
+				  <a href="matlab/multiple_sprung_masses/odesolver_mult.m">matlab 2</a>
+			  </td>
 			  <td>25 meter beam with two 5750 kg masses. Ansys results and compared to Matlab.</td>
 			</tr>
 			<tr>
@@ -158,6 +189,10 @@
 			  <td>100</td>
 			  <td>2</td>
 			  <td>?</td>
+			  <td><a href="ansys/2_beam_multiple_sprung_masses/beam_2_sprung_masses.inp">ansys</a> + 
+			      <a href="matlab/multiple_sprung_masses/mult_sdof_sprung_masses.m">matlab 1</a>,
+				  <a href="matlab/multiple_sprung_masses/odesolver_mult.m">matlab 2</a>
+			  </td>
 			  <td>50 meter beam with two 5750 kg masses. Ansys results and compared to Matlab.</td>
 			</tr>
 			<tr>
@@ -167,10 +202,14 @@
 			  <td>100</td>
 			  <td>2</td>
 			  <td>?</td>
+			  <td><a href="ansys/2_beam_multiple_sprung_masses/beam_2_sprung_masses.inp">ansys</a> + 
+			      <a href="matlab/multiple_sprung_masses/mult_sdof_sprung_masses.m">matlab 1</a>,
+				  <a href="matlab/multiple_sprung_masses/odesolver_mult.m">matlab 2</a>
+			  </td>
 			  <td>75 meter beam with two 5750 kg masses. Ansys results and compared to Matlab.</td>
 			</tr>
 			<tr>
-			  <th class="mid-header" colspan="5">2D Arch bridge with multiple sprung masses</th>
+			  <th class="mid-header" colspan="6">2D Arch bridge with multiple sprung masses</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/ansys.html?name=vel_160_ne_1">ne = 1</a>, 
@@ -183,7 +222,9 @@
 			  <td>160</td>
 			  <td>6</td>
 			  <td>1 - 50h*</td>
-			  <td>154 meter 2d arch bridge with sprung masses in Ansys. Note: bridge elements are actually elements between hangers, not total.</td>
+			  <td><a href="ansys/4_2d_arch_bridge/2d_arch_mult_masses.inp">ansys</a></td>
+			  <td>154 meter 2d arch bridge with sprung masses in Ansys.
+			      Note: bridge elements are actually elements between hangers, not total.</td>
 			</tr>
 			<tr>
 			  <td><a href="graphs/ansys.html?name=vel_160_nv_1">numerical differentiated</a> or 
@@ -192,6 +233,7 @@
 			  <td>160</td>
 			  <td>1</td>
 			  <td>?</td>
+			  <td><a href="ansys/4_2d_arch_bridge/2d_arch_mult_masses.inp">ansys</a></td>
 			  <td>154 meter 2d arch bridge with sprung mass in Ansys.</td>
 			</tr>
 			<tr>
@@ -199,6 +241,7 @@
 			  <td>160</td>
 			  <td>2</td>
 			  <td>?</td>
+			  <td><a href="ansys/4_2d_arch_bridge/2d_arch_mult_masses.inp">ansys</a></td>
 			  <td>154 meter 2d arch bridge with sprung mass in Ansys. Note: old and wrong train properties.</td>
 			</tr>
 			<tr>
@@ -206,6 +249,7 @@
 			  <td>160</td>
 			  <td>12</td>
 			  <td>?</td>
+			  <td><a href="ansys/4_2d_arch_bridge/2d_arch_mult_masses.inp">ansys</a></td>
 			  <td>154 meter 2d arch bridge with sprung mass in Ansys. Note: old and wrong train properties.</td>
 			</tr>
 			<tr>
@@ -213,6 +257,7 @@
 			  <td>125</td>
 			  <td>12</td>
 			  <td>50h</td>
+			  <td><a href="ansys/4_2d_arch_bridge/2d_arch_mult_masses.inp">ansys</a></td>
 			  <td>154 meter 2d arch bridge with SDOF sprung masses in Ansys. SDOFS with correct trailer/coach masses.</td>
 			</tr>
 			<tr>
@@ -220,23 +265,26 @@
 			  <td>125</td>
 			  <td>12</td>
 			  <td>50h</td>
+			  <td><a href="ansys/4_2d_arch_bridge/2d_arch_mult_masses.inp">ansys</a></td>
 			  <td>154 meter 2d arch bridge with 2DOF sprung masses in Ansys.</td>
 			</tr>
 			<tr>
-			  <th class="mid-header" colspan="5">3D Arch bridge with multiple sprung masses</th>
+			  <th class="mid-header" colspan="6">3D Arch bridge with multiple sprung masses</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/ansys.html?name=bridge_3d_vel_100_nv_12">3d bridge, 12 bogies</a></td>
 			  <td>100</td>
 			  <td>12</td>
 			  <td>?</td>
+			  <td><a href="ansys/5_3d_arch_bridge/arch_3d.inp">ansys</a></td>
 			  <td>154 meter 3d arch bridge with SDOF sprung masses in Ansys. Still old bogie properties.</td>
 			</tr>
 			<tr>
-			  <th class="mid-header" colspan="5">Kuilenburgse spoorbrug measurements on March 24, 2016.</th>
+			  <th class="mid-header" colspan="6">Kuilenburgse spoorbrug measurements on March 24, 2016.</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/experiment.html">all 8 full trips</a></td>
+			  <td>-</td>
 			  <td>-</td>
 			  <td>-</td>
 			  <td>-</td>
@@ -248,6 +296,7 @@
 			  <td>-</td>
 			  <td>-</td>
 			  <td>-</td>
+			  <td><a href="matlab/fft/fft_script_experiment_input.m">matlab fft</a></td>
 			  <td>Zoomed in on bridge parts and fast fourier transform.</td>
 			</tr>
 			<tr>
@@ -256,13 +305,14 @@
 			  <td>-</td>
 			  <td>-</td>
 			  <td>-</td>
+			  <td><a href="matlab/fft/fft_script_experiment_input.m">matlab fft</a></td>
 			  <td>Two measurements on track, not part of the bridge + fast fourier transforms.</td>
 			</tr>
 		  </tbody>
 		</table>
 	</main>
 	<footer style="height: 50px;">
-		<span style="font-size: smaller;">Last updated: April 8, 2016</span>
+		<span style="font-size: smaller;">Page last updated: April 8, 2016</span>
 	</footer>
 	</body>
 </html>
