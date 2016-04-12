@@ -27,9 +27,9 @@ A5 		= (2*m_vehicle*g)/(m_bridge*L)*H2*(sin(n*pi*L2/L));
 A6 		= (2*Omega_bogie2^2*m_vehicle)/(m_bridge*L)*H2*(sin(n*pi*L2/L));
 A7 		= (2*Omega_bogie2^2*m_vehicle)/(m_bridge*L)*H2*((sin(n*pi*L2/L))^2);
 B1		= Omega_bogie1^2;
-B2		= Omega_bogie1^2*H1*sin(n*pi*L1/L); %include H1?
+B2		= Omega_bogie1^2*H1*sin(n*pi*L1/L);
 C1 		= Omega_bogie2^2;
-C2 		= Omega_bogie2^2*H2*sin(n*pi*L2/L); %include H2?
+C2 		= Omega_bogie2^2*H2*sin(n*pi*L2/L);
 
 %
 % system of first order ordinary differential equations

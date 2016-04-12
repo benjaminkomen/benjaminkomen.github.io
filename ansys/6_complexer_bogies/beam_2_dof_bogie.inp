@@ -1,6 +1,6 @@
 !Name:			beam_2_dof_bogie
 !Date:			April 6, 2016
-!Last modified: April 6, 2016
+!Last modified: April 8, 2016
 !Description:	simply supported beam with two DOF bogie
 
 !******************************************************************
@@ -30,8 +30,20 @@ nn		= ne + 1				!number of nodes
 v		= 100/3.6	 			!velocity [m/s]
 dl		= l / ne				!delta length of small element
 dt		= dl / v  				!delta time of one time step
-nv		= 1						!number of travelling sprung masses
-nn_t    = 2*nn					!array dimension counter
+nv		= 2						!number of travelling sprung masses
+node_one 	= 1						!number of first node where bogies move
+node_end 	= nn					!number of last node where bogies move
+
+nv			= 2					!number of bogies
+*dim,bog_x,,nv						!bogies initial x-coordinate positions array
+bog_x(1) 	= 0
+bog_x(2) 	= -8
+
+*dim,bog_n,,nv						!bogies initial node positions array
+bog_n(1) 	= 2						!node number of bogie 1
+bog_n(2) 	= nint(bog_x(2)/dl)
+
+nn_t	= 2*nn+abs(bog_n(%nv%))+1		!array dimension counter
 
 !******************************************************************
 !define the dimension of some output variables
@@ -39,12 +51,12 @@ nn_t    = 2*nn					!array dimension counter
 *dim,ub_mid,,nn_t				!displacement bridge midspan
 
 !masses
-*dim,uv,,nn_t					!displacement bogie
-*dim,vv,,nn_t					!velocity bogie
-*dim,av,,nn_t					!acceleration bogie
-*dim,ub,,nn_t					!displacement bridge
-*dim,vb,,nn_t					!velocity bridge
-*dim,ab,,nn_t					!acceleration bridge
+*dim,uv,,nn_t,nv				!displacement bogie
+*dim,vv,,nn_t,nv				!velocity bogie
+*dim,av,,nn_t,nv				!acceleration bogie
+*dim,ub,,nn_t,nv				!displacement bridge
+*dim,vb,,nn_t,nv				!velocity bridge
+*dim,ab,,nn_t,nv				!acceleration bridge
 
 !******************************************************************
 !define material types
@@ -68,24 +80,34 @@ r,3,A_b,Izz,h_b
 
 !******************************************************************
 !mesh nodes and elements
-!vehicle: three mass elements
+!wheels
 type,1
-real,11
-n,1003,10,2			!X = 10, Y = 2
-e,1003
-real,12
-n,1002,10,1.5		!X = 10, Y = 1.5
-e,1002
 real,13
 n,1001,10,1			!X = 10, Y = 1
 e,1001
+n,2001,18,1			!X = 18, Y = 1
+e,2001
+!frames
+real,12
+n,1002,10,1.5		!X = 10, Y = 1.5
+e,1002
+n,2002,18,1.5		!X = 18, Y = 1.5
+e,2002
+!vehicle masses
+real,11
+n,1003,10,2			!X = 10, Y = 2
+e,1003
+n,2003,18,2			!X = 18, Y = 2
+e,2003
 
 !spring-damper element, connecting both masses
 type,2
 real,21
 en,1002,1002,1001
+en,2002,2002,2001
 real,22
 en,1003,1003,1002
+en,2003,2003,2002
 
 !bridge nodes
 *do,i,1,nn
@@ -106,6 +128,7 @@ e,i,i+1
 d,1,ux,,,,,uy
 d,nn,uy
 d,1001,all
+d,2001,all
 
 !******************************************************************
 !start transient analysis mode
@@ -118,33 +141,72 @@ time,dt/1000
 timint,off			!no transient effects
 solve
 
-uv(1)=uy(1003)
-vv(1)=0
-av(1)=0
-ub(1)=0
-vb(1)=0
-ab(1)=0
 ub_mid(1)=uy(node(l/2,0,0))
+
+!bogies
+*do,i,1,nv
+	uv(1,i)=uy(1000*i+3)
+	vv(1,i)=0
+	av(1,i)=0
+	ub(1,i)=0
+	vb(1,i)=0
+	ab(1,i)=0
+*enddo
 
 !now perform a full transient analysis, first only apply a load at node 2
 timint,on						!include transient effects
 time,dt
 f,2,fy,-((m1+m2+m3)*g)
+outres,all,all
 solve
 
 !loop over bridge, move vehicle step by step and compute solution for every step
 *do,ii,2,nn_t
-	uv(ii)=uy(1003)
-	vv(ii)=(uv(ii)-uv(ii-1))/dt
-	av(ii)=(vv(ii)-vv(ii-1))/dt
-	ub(ii)=uy(ii+1)
-	vb(ii)=(ub(ii)-ub(ii-1))/dt
-	ab(ii)=(vb(ii)-vb(ii-1))/dt
 	ub_mid(ii)=uy(node(l/2,0,0))
+
+	!bogies
+	*do,i,1,nv
+		uv(ii,i)=uy(1000*i+3)
+		vv(ii,i)=vy(1000*i+3)
+		av(ii,i)=ay(1000*i+3)
+		
+		!bridge deflection under bogie is bridge node deflection, if bogie is still on beam, else zero (post approach bridge no deflection)
+		*if,bog_n(i),GE,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			ub(ii,i)=uy(bog_n(i)+1)
+			vb(ii,i)=vy(bog_n(i)+1)
+			ab(ii,i)=ay(bog_n(i)+1)
+		*else
+			ub(ii,i)=0
+			vb(ii,i)=0
+			ab(ii,i)=0
+		*endif
+	*enddo
+	
 	time,ii*dt
 	fdele,all,all
-	f,ii+1,fy,(-((m1+m2+m3)*g)-m3*ab(ii)+k1*(uv(ii)-ub(ii))+c1*(vv(ii)-vb(ii)))
-	d,1001,uy,ub(ii)
+	
+	!move vehicles one node
+	*do,i,1,nv
+		bog_n(i) = bog_n(i)+1
+		!if bogies reach the bridge, give them node number of start bridge, not necessarily 1
+		*if,bog_n(i),eq,0,THEN
+			bog_n(i) = node_one
+		*endif
+	*enddo
+	
+	!apply contact force on beam, if bogie is already/still on beam
+	*do,i,1,nv
+		*if,bog_n(i),GT,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			!applied contact force depends on motor/trailer bogie and motor/trailer coach; there are 3 combinations
+			f,bog_n(i),fy,(-((m1+m2+m3)*g)-m3*ab(ii,i)+k1*(uv(ii,i)-ub(ii,i))+c1*(vv(ii,i)-vb(ii,i)))
+		*endif
+	*enddo
+	
+	!give vehicles reaction displacement
+	*do,i,1,nv
+		d,(1000*i+1),uy,ub(ii,i)
+	*enddo
+	outres,all,all
 	solve
 *enddo
 
