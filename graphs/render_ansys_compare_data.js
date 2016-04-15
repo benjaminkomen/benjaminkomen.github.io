@@ -136,7 +136,7 @@ $(document).ready(function() {
 							}
 						});
 						//create an object for every input_category in the series array
-						for (i=0;i<input_categories.length;i++) {
+						for (i=iterate_start;i<input_categories.length;i++) {
 							options.series.push({
 								name: input_categories[i],
 								data: []
@@ -151,16 +151,17 @@ $(document).ready(function() {
 						if (line != "") {
 							var items = line.split(',');
 							$.each(items, function(itemNo, item) {
-								//check if item exists and is a number
-								if(!isNaN(item) && $.trim(item)) {
-									options.series[itemNo].data.push(parseFloat(item));
-								}
-							});
+							//check if item exists and is a number
+							if(!isNaN(item) && $.trim(item)) {
+								var cat_nr = iterate_start + itemNo;
+								options.series[cat_nr].data.push(parseFloat(item));
+							}
+						});
 						}
 					}
 				});
+				var iterate_start = options.series.length;
 			}
-			var iterate_start = options.series.length;
 			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 			},
