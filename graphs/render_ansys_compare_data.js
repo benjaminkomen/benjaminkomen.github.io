@@ -104,59 +104,61 @@ $(document).ready(function() {
 			var input_categories = [];
 			var timestep = '';
 			//console.log(lines1);
-			// Iterate over the ansys lines and add categories or series
-			$.each(lines0, function(lineNo, line) {
-				// first line contains time
-				if (lineNo == 0) {
-					var items = line.split(':');
-					//extract timestep from input
-					timestep = +(Math.round(parseFloat($.trim(items[1])) + "e+4")  + "e-4");
-				}
-				// second line contains yAxislabel
-				else if (lineNo == 1) {
-					var items = line.split(':');
-					//extract yAxislabel from input and add to graph
-					options.yAxis.title.text = $.trim(items[1]);
-				}
-				// third line contains graph title
-				else if (lineNo == 2) {
-					var items = line.split(':');
-					//extract graph title from input and add to graph
-					options.title.text = $.trim(items[1]);
-				}
-				// fourth line containes categories, put in input_categories array
-				else if (lineNo == 3) {
-					var items = line.split(',');
-					$.each(items, function(itemNo, item) {
-						//check if item exists and not an empty space after the last comma
-						if($.trim(item)) {
-							input_categories.push(ansys_sub_folder[0] + '_' + $.trim(item));
-						}
-					});
-					//create an object for every input_category in the series array
-					for (i=0;i<input_categories.length;i++) {
-						options.series.push({
-							name: input_categories[i],
-							data: []
-						})
-						//put timestep as pointInterval for every input_category
-						options.series[i].pointInterval = timestep;
+			for (k=0;k<count;k++) {
+				// Iterate over the ansys lines and add categories or series
+				$.each(lines[k], function(lineNo, line) {
+					// first line contains time
+					if (lineNo == 0) {
+						var items = line.split(':');
+						//extract timestep from input
+						timestep = +(Math.round(parseFloat($.trim(items[1])) + "e+4")  + "e-4");
 					}
-				}
-				// the rest of the lines contain data, put them in series
-				else {
-					//exclude last empty line
-					if (line != "") {
+					// second line contains yAxislabel
+					else if (lineNo == 1) {
+						var items = line.split(':');
+						//extract yAxislabel from input and add to graph
+						options.yAxis.title.text = $.trim(items[1]);
+					}
+					// third line contains graph title
+					else if (lineNo == 2) {
+						var items = line.split(':');
+						//extract graph title from input and add to graph
+						options.title.text = $.trim(items[1]);
+					}
+					// fourth line containes categories, put in input_categories array
+					else if (lineNo == 3) {
 						var items = line.split(',');
 						$.each(items, function(itemNo, item) {
-							//check if item exists and is a number
-							if(!isNaN(item) && $.trim(item)) {
-								options.series[itemNo].data.push(parseFloat(item));
+							//check if item exists and not an empty space after the last comma
+							if($.trim(item)) {
+								input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
 							}
 						});
+						//create an object for every input_category in the series array
+						for (i=0;i<input_categories.length;i++) {
+							options.series.push({
+								name: input_categories[i],
+								data: []
+							})
+							//put timestep as pointInterval for every input_category
+							options.series[i].pointInterval = timestep;
+						}
 					}
-				}
-			});
+					// the rest of the lines contain data, put them in series
+					else {
+						//exclude last empty line
+						if (line != "") {
+							var items = line.split(',');
+							$.each(items, function(itemNo, item) {
+								//check if item exists and is a number
+								if(!isNaN(item) && $.trim(item)) {
+									options.series[itemNo].data.push(parseFloat(item));
+								}
+							});
+						}
+					}
+				});
+			}
 			var iterate_start = options.series.length;
 			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
