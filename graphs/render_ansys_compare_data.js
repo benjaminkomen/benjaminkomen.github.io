@@ -90,10 +90,11 @@ $(document).ready(function() {
 		//for (i=1;i<count;i++) {
 		//	data_file_get = data_files[i][fileNo];
 		//}
+		var d0 = $.get(data_files[0][fileNo]);		//get ansys data file
 		var d1 = $.get(data_files[1][fileNo]);		//get ansys data file
 		var d2 = $.get(data_files[2][fileNo]);		//get ansys data file
 
-		$.when(d1, d2).done(function(data0, data1, data2) {
+		$.when(d0, d1, d2).done(function(data0, data1, data2) {
 			// Split the lines
 			var lines0 = data0[0].split('\n');
 			var lines1 = data1[0].split('\n');
