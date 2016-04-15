@@ -105,7 +105,7 @@ $(document).ready(function() {
 			var timestep = '';
 			//console.log(lines1);
 			for (k=0;k<count;k++) {
-				console.log('processing ' + lines[k] + 'from ' + ansys_sub_folder[k]);
+				console.log('processing lines from ' + ansys_sub_folder[k]);
 				// Iterate over the ansys lines and add categories or series
 				$.each(lines[k], function(lineNo, line) {
 					// first line contains time
