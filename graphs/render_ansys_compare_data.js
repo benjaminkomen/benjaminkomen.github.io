@@ -90,9 +90,9 @@ $(document).ready(function() {
 		//for (i=1;i<count;i++) {
 		//	data_file_get = data_files[i][fileNo];
 		//}
-		var d0 = $.get(data_files[0][fileNo]);		//get ansys data file
-		var d1 = $.get(data_files[1][fileNo]);		//get ansys data file
-		var d2 = $.get(data_files[2][fileNo]);		//get ansys data file
+		var d0 = $.get(data_files[0][fileNo]);		//get ansys data file 1
+		var d1 = $.get(data_files[1][fileNo]);		//get ansys data file 2
+		var d2 = $.get(data_files[2][fileNo]);		//get ansys data file 3
 
 		$.when(d0, d1, d2).done(function(data0, data1, data2) {
 			// Split the lines
@@ -103,9 +103,9 @@ $(document).ready(function() {
 			//define array with input categories
 			var input_categories = [];
 			var timestep = '';
-			console.log(lines1);
+			//console.log(lines1);
 			// Iterate over the ansys lines and add categories or series
-			$.each(lines1, function(lineNo, line) {
+			$.each(lines0, function(lineNo, line) {
 				// first line contains time
 				if (lineNo == 0) {
 					var items = line.split(':');
@@ -130,7 +130,7 @@ $(document).ready(function() {
 					$.each(items, function(itemNo, item) {
 						//check if item exists and not an empty space after the last comma
 						if($.trim(item)) {
-							input_categories.push($.trim(item));
+							input_categories.push(ansys_sub_folder[0] + '_' + $.trim(item));
 						}
 					});
 					//create an object for every input_category in the series array
