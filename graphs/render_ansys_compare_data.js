@@ -99,10 +99,11 @@ $(document).ready(function() {
 			var lines0 = data0[0].split('\n');
 			var lines1 = data1[0].split('\n');
 			var lines2 = data2[0].split('\n');
+			var lines = [lines0, lines1, lines2];
 			//define array with input categories
 			var input_categories = [];
 			var timestep = '';
-			
+			console.log(lines1);
 			// Iterate over the ansys lines and add categories or series
 			$.each(lines1, function(lineNo, line) {
 				// first line contains time
@@ -157,58 +158,6 @@ $(document).ready(function() {
 				}
 			});
 			var iterate_start = options.series.length;
-			// Iterate over the matlab lines
-			$.each(lines2, function(lineNo, line) {
-				// first line contains time
-				if (lineNo == 0) {
-					var items = line.split(':');
-					//extract timestep from input
-					timestep = +(Math.round(parseFloat($.trim(items[1])) + "e+4")  + "e-4");
-				}
-				// second line contains yAxislabel, but we assume it is already defined
-				else if (lineNo == 1) {
-					//
-				}
-				// third line contains graph title, but we assume it is already defined
-				else if (lineNo == 2) {
-					//
-				}
-				// fourth line contains input_categories
-				else if (lineNo == 3) {
-					var items = line.split(',');
-					$.each(items, function(itemNo, item) {
-						//check if item exists and not an empty space after the last comma
-						if($.trim(item)) {
-							input_categories.push($.trim(item));
-						}
-					});
-					//create an object for every input_category in the series array
-					for (i=iterate_start;i<input_categories.length;i++) {
-						options.series.push({
-							name: input_categories[i],
-							data: []
-						})
-						//put timestep as pointInterval for every input_category
-						options.series[i].pointInterval = timestep;
-					}
-				}
-				// the rest of the lines contain data, put them in series
-				else {
-					//exclude last empty line
-					if (line != "") {
-						var items = line.split(',');
-						$.each(items, function(itemNo, item) {
-							//check if item exists and is a number
-							if(!isNaN(item) && $.trim(item)) {
-								var cat_nr = iterate_start + itemNo;
-								//console.log('itemNo is: ' + itemNo + ', but I put data in: ' + cat_nr);
-								//console.log('catnr is: ' + cat_nr + ' and I submit item: ' + item);
-								options.series[cat_nr].data.push(parseFloat(item));
-							}
-						});
-					}
-				}
-			});
 			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 			},
