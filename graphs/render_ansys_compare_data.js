@@ -101,32 +101,23 @@ $(document).ready(function() {
 			series : []
 		};
 	
-		//Load the ansys data file and add correct data items to array
+		//Load any number of ansys data files
 		var data_file_get = [];
 		for (i=0;i<count;i++) {
 			data_file_get[i] = $.get(data_files[i][fileNo]);
 		}
-		//var data_files_get = data_file_get.toString();
-		//var d0 = $.get(data_files[0][fileNo]);		//get ansys data file 1
-		//var d1 = $.get(data_files[1][fileNo]);		//get ansys data file 2
-		//var d2 = $.get(data_files[2][fileNo]);		//get ansys data file 3
 		
-		//get an array of data_files and when done continue
+		//when all data files are loaded, continue
 		$.when.all(data_file_get).done(function(schemas) {
 			// Split the lines
 			var lines = [];
+			//for each data file, extract the lines and split by linebreak
 			$.each(schemas, function(schemaNo, schema) {
 				lines[schemaNo] = schema[0].split('\n');
 			});
-			console.log(lines);
-			//var lines0 = data0[0].split('\n');
-			//var lines1 = data1[0].split('\n');
-			//var lines2 = data2[0].split('\n');
-			//var lines = [lines0, lines1, lines2];
 			//define array with input categories
 			var input_categories = [];
 			var timestep = '';
-			//console.log(lines1);
 			var iterate_start = 0;
 			for (k=0;k<count;k++) {
 				console.log('processing lines from ' + ansys_sub_folder[k]);
