@@ -86,10 +86,11 @@ $(document).ready(function() {
 		};
 	
 		//Load the data file and add correct data items to array
-		//var data_file_get = [];
-		//for (i=1;i<count;i++) {
-		//	data_file_get = data_files[i][fileNo];
-		//}
+		var data_file_get = [];
+		for (i=0;i<count;i++) {
+			data_file_get[i] = $.get(data_files[i][fileNo]);
+		}
+		console.log(data_file_get);
 		var d0 = $.get(data_files[0][fileNo]);		//get ansys data file 1
 		var d1 = $.get(data_files[1][fileNo]);		//get ansys data file 2
 		var d2 = $.get(data_files[2][fileNo]);		//get ansys data file 3
