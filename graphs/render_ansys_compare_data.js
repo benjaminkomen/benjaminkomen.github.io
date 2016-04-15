@@ -52,7 +52,6 @@ $(document).ready(function() {
 			data_files[i].push(ansys_base_folder + ansys_sub_folder[i] + '/' + j + '.txt');
 		}
 	}
-	console.log(data_files);
 	var ansys_title = ansys_sub_folder.toString();
 	$("h2#title").html('Compare Ansys runs: ' + ansys_title);
 	
@@ -120,7 +119,6 @@ $(document).ready(function() {
 			var timestep = '';
 			var iterate_start = 0;
 			for (k=0;k<count;k++) {
-				console.log('processing lines from ' + ansys_sub_folder[k]);
 				// Iterate over the ansys lines and add categories or series
 				$.each(lines[k], function(lineNo, line) {
 					// first line contains time
