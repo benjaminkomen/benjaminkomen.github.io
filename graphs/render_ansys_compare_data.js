@@ -85,17 +85,18 @@ $(document).ready(function() {
 			series : []
 		};
 	
-		//Load the data file and add correct data items to array
+		//Load the ansys data file and add correct data items to array
 		var data_file_get = [];
 		for (i=0;i<count;i++) {
 			data_file_get[i] = $.get(data_files[i][fileNo]);
 		}
 		console.log(data_file_get);
+		//var data_files_get = data_file_get.toString();
 		var d0 = $.get(data_files[0][fileNo]);		//get ansys data file 1
 		var d1 = $.get(data_files[1][fileNo]);		//get ansys data file 2
 		var d2 = $.get(data_files[2][fileNo]);		//get ansys data file 3
 
-		$.when(d0, d1, d2).done(function(data0, data1, data2) {
+		$.when(data_file_get).done(function(data0, data1, data2) {
 			// Split the lines
 			var lines0 = data0[0].split('\n');
 			var lines1 = data1[0].split('\n');
