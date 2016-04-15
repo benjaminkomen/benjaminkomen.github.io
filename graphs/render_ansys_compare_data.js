@@ -14,7 +14,23 @@ $(document).ready(function() {
     if (!results) return null;
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
-}	
+	}
+
+	// Array of deferred objects
+	if (jQuery.when.all===undefined) {
+		jQuery.when.all = function(deferreds) {
+			var deferred = new jQuery.Deferred();
+			$.when.apply(jQuery, deferreds).then(
+				function() {
+					deferred.resolve(Array.prototype.slice.call(arguments));
+				},
+				function() {
+					deferred.fail(Array.prototype.slice.call(arguments));
+				});
+
+			return deferred;
+		}
+	}
 	
 	//count how many parameters in url
 	var url = window.location.href;
@@ -96,7 +112,8 @@ $(document).ready(function() {
 		var d1 = $.get(data_files[1][fileNo]);		//get ansys data file 2
 		var d2 = $.get(data_files[2][fileNo]);		//get ansys data file 3
 
-		$.when(data_file_get).done(function(data0, data1, data2) {
+		$.when.all(data_file_get).done(function(schemas) {
+			console.log("DONE", this, schemas);
 			// Split the lines
 			var lines0 = data0[0].split('\n');
 			var lines1 = data1[0].split('\n');
