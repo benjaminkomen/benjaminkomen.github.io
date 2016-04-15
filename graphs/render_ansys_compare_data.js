@@ -117,7 +117,7 @@ $(document).ready(function() {
 			var lines = [];
 			$.each(schemas, function(schemaNo, schema) {
 				lines[schemaNo] = schema[0].split('\n');
-			}
+			});
 			console.log(lines);
 			//var lines0 = data0[0].split('\n');
 			//var lines1 = data1[0].split('\n');
