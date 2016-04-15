@@ -106,19 +106,23 @@ $(document).ready(function() {
 		for (i=0;i<count;i++) {
 			data_file_get[i] = $.get(data_files[i][fileNo]);
 		}
-		console.log(data_file_get);
 		//var data_files_get = data_file_get.toString();
-		var d0 = $.get(data_files[0][fileNo]);		//get ansys data file 1
-		var d1 = $.get(data_files[1][fileNo]);		//get ansys data file 2
-		var d2 = $.get(data_files[2][fileNo]);		//get ansys data file 3
-
+		//var d0 = $.get(data_files[0][fileNo]);		//get ansys data file 1
+		//var d1 = $.get(data_files[1][fileNo]);		//get ansys data file 2
+		//var d2 = $.get(data_files[2][fileNo]);		//get ansys data file 3
+		
+		//get an array of data_files and when done continue
 		$.when.all(data_file_get).done(function(schemas) {
-			console.log("DONE", this, schemas);
 			// Split the lines
-			var lines0 = data0[0].split('\n');
-			var lines1 = data1[0].split('\n');
-			var lines2 = data2[0].split('\n');
-			var lines = [lines0, lines1, lines2];
+			var lines = [];
+			$.each(schemas, function(schemaNo, schema) {
+				lines[schemaNo] = schema[0].split('\n');
+			}
+			console.log(lines);
+			//var lines0 = data0[0].split('\n');
+			//var lines1 = data1[0].split('\n');
+			//var lines2 = data2[0].split('\n');
+			//var lines = [lines0, lines1, lines2];
 			//define array with input categories
 			var input_categories = [];
 			var timestep = '';
