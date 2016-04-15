@@ -104,6 +104,7 @@ $(document).ready(function() {
 			var input_categories = [];
 			var timestep = '';
 			//console.log(lines1);
+			var iterate_start = 0;
 			for (k=0;k<count;k++) {
 				console.log('processing lines from ' + ansys_sub_folder[k]);
 				// Iterate over the ansys lines and add categories or series
@@ -160,7 +161,7 @@ $(document).ready(function() {
 						}
 					}
 				});
-				var iterate_start = options.series.length;
+				iterate_start = options.series.length;
 			}
 			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
