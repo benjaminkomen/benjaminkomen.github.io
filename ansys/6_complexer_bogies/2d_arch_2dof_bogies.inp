@@ -1,7 +1,7 @@
 !Name:			2d_arch_2dof_bogies
 !Date:			April 5, 2016
-!Last modified: April 5, 2016
-!Description:	2D arch bridge, with 12 2DOF bogies using correct parameters
+!Last modified: April 18, 2016
+!Description:	2D arch bridge, with 2DOF bogies
 
 !******************************************************************
 finish
@@ -19,52 +19,12 @@ ne 			= 50					!number of elements between hangers
 nn 			= ne + 1				!number of nodes between hangers
 neg			= ((nh+1)*ne)			!number of elements on girder
 nng 		= neg+1					!number of nodes on girder
-dl 			= l / neg				!delta length of small element [m]
-dl2			= l_sp / ne				!delta length keypoints girder [m]
-dt 			= dl / v  				!delta time of one time step [t]
-node_one 	= 1						!number of first node where bogies move
-node_end 	= nng					!number of last node where bogies move
+dl 			= l/neg					!delta length of small element [m]
+dl2			= l_sp/ne				!delta length keypoints girder [m]
+dt 			= dl/v  				!delta time of one time step [t]
 
-!vehicles
-!coaches
-m_1m		= 0.5*50000				!motor coach mass [kg]
-m_1t		= 0.5*43000				!trailer coach mass [kg]
-!motor bogie
-m_2m		= 8620					!motor frame mass [kg]
-m_3m		= 2*1200				!two motor wheelsets mass [kg]
-k_pm		= 5000000				!primary stiffness motor bogie [N/m]
-c_pm		= 103803				!primary damping motor bogie [Ns/m]
-k_sm		= 920000				!secondary stiffness motor bogie [N/m]
-c_sm		= 1						!secondary damping motor bogie [Ns/m]
-!trailer bogie
-m_2t		= 8370					!trailer frame mass [kg]
-m_3t		= 2*1700				!two trailer wheelsets mass [kg]
-k_pt		= 3400000				!primary stiffnes trailer bogie [N/m]
-c_pt		= 64996					!primary damping trailer bogie [Ns/m]
-k_st		= 920000				!secondary stiffnes trailer bogie [N/m]
-c_st		= 1						!secondary damping trailer bogie [Ns/m]
-
-nv			= 12					!number of bogies
-*dim,bog_x,,nv						!bogies initial x-coordinate positions array assuming 6 part VIRM
-bog_x(1) 	= 0
-bog_x(2) 	= -20
-bog_x(3) 	= bog_x(2)-3.55-3.05
-bog_x(4) 	= bog_x(3)-20
-bog_x(5) 	= bog_x(4)-3.05-3.55
-bog_x(6) 	= bog_x(5)-20
-bog_x(7) 	= bog_x(6)-3.55-3.05
-bog_x(8) 	= bog_x(7)-20
-bog_x(9) 	= bog_x(8)-3.05-3.55
-bog_x(10) 	= bog_x(9)-20
-bog_x(11) 	= bog_x(10)-3.55-3.05
-bog_x(12) 	= bog_x(11)-20
-
-*dim,bog_n,,nv						!bogies initial node positions array
-bog_n(1) 	= 2						!node number of bogie 1
-
-*do,i,2,nv
-	bog_n(%i%) = nint(bog_x(%i%)/dl)
-*enddo
+!read all the vehicle data related to input variables
+/input,vehicle_2dof_bogies,inp,,:vars
 
 !steel
 E_st		= 2.1e11				!Youngs modulus [N/m2]
@@ -151,27 +111,12 @@ r,2,A_girder,I_girder,H_girder
 et,3,beam3
 r,3,A_hanger,I_hanger,H_hanger
 
-!define bogies
-et,4,mass21,,,4
-r,11,m_1m				!motor coach mass
-r,12,m_2m  				!motor bogie frame
-r,13,m_3m				!motor bogie wheelsets
-r,14,m_1t				!trailer coach mass
-r,15,m_2t				!trailer bogie frame
-r,16,m_3t				!trailer bogie wheelsets
-
-!define spring-damper
-et,5,combin14,,2
-r,21,k_pm,c_pm			!motor bogie primary suspension
-r,22,k_sm,c_sm			!motor bogie secondary suspension
-r,23,k_pt,c_pt			!trailer bogie primary suspension
-r,24,k_st,c_st			!trailer bogie secondary suspension
+/input,vehicle_2dof_bogies,inp,,:etypes
 
 !******************************************************************
-!place keypoints and lines and attach properties
+!construct bridge: place keypoints and lines and attach properties
 !girder
 *get,cur_max,kp,,num,max						!current maximum keypoint number
-!cur_max = 24
 lsel,none
 *do,i,1,nng
 	*if,cur_max,eq,0,then
@@ -236,85 +181,9 @@ lmesh,all				!generate nodes and line elements along all selected lines
 !hangers
 lsel,s,type,,3			!select all lines of element type 3
 lesize,all,,,3			!number of element divisions per line
-!lesize,all,,,1			!only one for link8 element
 lmesh,all				!generate nodes and line elements along all selected lines
 
-!bogies
-*do,i,1,nv
-	type,4
-	!bogies 1,2,5,6,11 and 12 at motor coaches, the rest trailer coaches
-	*if,i,eq,1,or,i,eq,2,then
-		!place motor bogies
-		real,11
-		n,(10000*i+3),i,31			!upper mass
-		e,(10000*i+3)
-	*elseif,i,eq,5,or,i,eq,6,then
-		!place motor bogies
-		real,11
-		n,(10000*i+3),i,31			!upper mass
-		e,(10000*i+3)
-	*elseif,i,eq,11,or,i,eq,12,then
-		!place motor bogies
-		real,11
-		n,(10000*i+3),i,31			!upper mass
-		e,(10000*i+3)
-	*else
-		!place trailer bogies
-		real,14
-		n,(10000*i+3),i,31			!upper mass
-		e,(10000*i+3)
-	*endif
-	!bogies 2,6 and 11 are motor bogies, the rest are trailer bogies
-	*if,i,eq,2,or,i,eq,6,then
-		!place motor bogies
-		type,4
-		real,12
-		n,(10000*i+2),i,30.5		!middle mass
-		e,(10000*i+2)
-		real,13
-		n,(10000*i+1),i,30			!lower mass
-		e,(10000*i+1)
-		!place spring-dampers
-		type,5
-		real,21
-		en,(10000*i+2),(10000*i+2),(10000*i+1)	!primary suspension
-		real,22
-		en,(10000*i+3),(10000*i+3),(10000*i+2)	!secondary suspension
-	*elseif,i,eq,11,then
-		!place motor bogies
-		type,4
-		real,12
-		n,(10000*i+2),i,30.5		!middle mass
-		e,(10000*i+2)
-		real,13
-		n,(10000*i+1),i,30			!lower mass
-		e,(10000*i+1)
-		!place spring-dampers
-		type,5
-		real,21
-		en,(10000*i+2),(10000*i+2),(10000*i+1)	!primary suspension
-		real,22
-		en,(10000*i+3),(10000*i+3),(10000*i+2)	!secondary suspension
-	*else
-		!place trailer bogies
-		type,4
-		real,15
-		n,(10000*i+2),i,30.5		!middle mass
-		e,(10000*i+2)
-		real,16
-		n,(10000*i+1),i,30			!lower mass
-		e,(10000*i+1)
-		!place spring-dampers
-		type,5
-		real,23
-		en,(10000*i+2),(10000*i+2),(10000*i+1)	!primary suspension
-		real,24
-		en,(10000*i+3),(10000*i+3),(10000*i+2)	!secondary suspension
-	*endif
-	!constrain lower mass, all DOF
-	d,(10000*i+1),all
-*enddo
-
+/input,vehicle_2dof_bogies,inp,,:meshing
 
 !******************************************************************
 !DOFs
@@ -347,88 +216,9 @@ t(1) = 0
 ub_mid(1)=uy(node(l/2,0,0))
 ub_25(1)=uy(node(l/4,0,0))
 
-!bogies
-*do,i,1,nv
-	uv(1,i)=uy(10000*i+3)
-	vv(1,i)=0
-	av(1,i)=0
-	ub(1,i)=0
-	vb(1,i)=0
-	ab(1,i)=0
-*enddo
+/input,vehicle_2dof_bogies,inp,,:initcon
 
-!now perform a transient analysis (default = full), first only apply a load at node 2
-timint,on						!include transient effects
-time,dt
-f,node_one+1,fy,-((m_1m+m_2t+m_3t)*g)
-outres,all,all
-solve
-
-!******************************************************************
-!loop over bridge
-*do,ii,node_one+1,nn_t
-	!write data to arrays
-	t(ii)=(ii-1)*dt
-	!bridge
-	ub_mid(ii)=uy(node(l/2,0,0))
-	ub_25(ii)=uy(node(l/4,0,0))
-	
-	!bogies
-	*do,i,1,nv
-		uv(ii,i)=uy(10000*i+3)
-		vv(ii,i)=vy(10000*i+3)
-		av(ii,i)=ay(10000*i+3)
-		
-		!bridge deflection under bogie is bridge node deflection, if bogie is still on beam, else zero (post approach bridge no deflection)
-		*if,bog_n(i),GE,node_one,AND,bog_n(i),LE,node_end-1,THEN
-			ub(ii,i)=uy(bog_n(i)+1)
-			vb(ii,i)=vy(bog_n(i)+1)
-			ab(ii,i)=ay(bog_n(i)+1)
-		*else
-			ub(ii,i)=0
-			vb(ii,i)=0
-			ab(ii,i)=0
-		*endif
-	*enddo
-
-	time,ii*dt
-	fdele,all,all
-
-	!move vehicles one node
-	*do,i,1,nv
-		bog_n(i) = bog_n(i)+1
-		!if bogies reach the bridge, give them node number of start bridge, not necessarily 1
-		*if,bog_n(i),eq,0,THEN
-			bog_n(i) = node_one
-		*endif
-	*enddo
-
-	!apply contact force on beam, if bogie is already/still on beam
-	*do,i,1,nv
-		*if,bog_n(i),GT,node_one,AND,bog_n(i),LE,node_end-1,THEN
-			!applied contact force depends on motor/trailer bogie and motor/trailer coach; there are 3 combinations
-			*if,i,eq,1,or,i,eq,5,then
-				f,bog_n(i),fy,(-(m_1m+m_2t+m_3t)*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
-			*elseif,i,eq,12,then
-				f,bog_n(i),fy,(-(m_1m+m_2t+m_3t)*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
-			*elseif,i,eq,2,or,i,eq,6,then
-				f,bog_n(i),fy,(-(m_1m+m_2m+m_3m)*g-m_3m*ab(ii,i)+k_pm*(uv(ii,i)-ub(ii,i))+c_pm*(vv(ii,i)-vb(ii,i)))
-			*elseif,i,eq,11,then
-				f,bog_n(i),fy,(-(m_1m+m_2m+m_3m)*g-m_3m*ab(ii,i)+k_pm*(uv(ii,i)-ub(ii,i))+c_pm*(vv(ii,i)-vb(ii,i)))
-			*else
-				f,bog_n(i),fy,(-(m_1t+m_2t+m_3t)*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
-			*endif
-		*endif
-	*enddo
-
-	!give vehicles reaction displacement
-	*do,i,1,nv
-		d,(10000*i+1),uy,ub(ii,i)
-	*enddo
-	outres,all,all
-	solve
-*enddo
-
+/input,vehicle_2dof_bogies,inp,,:mainrun
 !******************************************************************
 !write results to output files
 !bridge deflection
