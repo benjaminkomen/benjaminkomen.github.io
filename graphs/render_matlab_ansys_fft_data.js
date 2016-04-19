@@ -48,8 +48,8 @@ $(document).ready(function() {
 	$.each(data_base_folders, function(fileNo, data_base_folder) {
 		var url_data = data_base_folder + data_sub_folder + '/' + data_file_name + '.txt';
 		var url_fft = data_base_folder + data_sub_folder + '/fft/' + data_file_name + '.txt';
-		if (checkExists(url_data == 1)) { data_files1.push(url_data); }
-		if (checkExists(url_data == 1)) { data_files2.push(url_fft); }
+		if (checkExists(url_data)  == 1) { data_files1.push(url_data); }
+		if (checkExists(url_data) == 1) { data_files2.push(url_fft); }
 	});
 	
 	//loop through matlabs/ansys data files and preprocess data to plot graph
