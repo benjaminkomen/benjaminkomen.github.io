@@ -18,19 +18,10 @@ $(document).ready(function() {
 	
 	//define function to check if file exists
 	function checkExists(url_input) {
-		$.ajax({
-		url:url_input,
-		type:'HEAD',
-		error: function()
-		{
-			//file not exists
-			return 0;
-		},
-		success: function()
-		{
-			//file exists
-			return 1;
-		}
+		$(url_input).load(function() {
+		return true;
+		}).bind('error', function() {
+		return false;
 		});
 	}
 	
@@ -49,8 +40,8 @@ $(document).ready(function() {
 		var url_data = data_base_folder + data_sub_folder + '/' + data_file_name + '.txt';
 		var url_fft = data_base_folder + data_sub_folder + '/fft/' + data_file_name + '.txt';
 		console.log(checkExists(url_data));
-		if (checkExists(url_data)  == 1) { data_files1.push(url_data); }
-		if (checkExists(url_fft) == 1) { data_files2.push(url_fft); }
+		if (checkExists(url_data)) { data_files1.push(url_data); }
+		if (checkExists(url_fft)) { data_files2.push(url_fft); }
 	});
 	
 	//loop through matlabs/ansys data files and preprocess data to plot graph
