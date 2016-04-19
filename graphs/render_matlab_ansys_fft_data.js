@@ -14,19 +14,43 @@ $(document).ready(function() {
     if (!results) return null;
     if (!results[2]) return '';
     return decodeURIComponent(results[2].replace(/\+/g, " "));
-}
+	}
+	
+	//define function to check if file exists
+	function checkExists(url_input) {
+		$.ajax({
+		url:url_input,
+		type:'HEAD',
+		error: function()
+		{
+			//file not exists
+			return 0;
+		},
+		success: function()
+		{
+			//file exists
+			return 1;
+		}
+		});
+	}
+	
 	//location of data files
 	var data_sub_folder = getParameterByName('folder');
 	var data_file_name = getParameterByName('file');
-	var data_base_folder = 'matlab-data/';
+	var data_base_folders = ['matlab-data/', 'ansys-data/'];
 	$("h2#title").html('Folder: ' + data_sub_folder + ' file: ' + data_file_name + ' time history and fast fourier transform');
 	var data_files1 = [];
 	var data_files2 = [];
 	var graph_name = [data_sub_folder, data_sub_folder + '_fft'];
 	var xAxis_label = ['Time [s]', 'Frequency [Hz]'];
 	var yAxis_label = ['', '|P1(f)|']
-	data_files1.push(data_base_folder + data_sub_folder + '/' + data_file_name + '.txt');
-	data_files2.push(data_base_folder + data_sub_folder + '/fft/' + data_file_name + '.txt');
+	//first check if file exists, then push it to array to be obtained later
+	$.each(data_base_folders, function(fileNo, data_base_folder) {
+		var url_data = data_base_folder + data_sub_folder + '/' + data_file_name + '.txt';
+		var url_fft = data_base_folder + data_sub_folder + '/fft/' + data_file_name + '.txt';
+		if (checkExists(url_data == 1) { data_files1.push(url_data); }
+		if (checkExists(url_data == 1) { data_files2.push(url_fft); }
+	});
 	
 	//loop through matlabs/ansys data files and preprocess data to plot graph
 	$.each(data_files1, function(fileNo, data_file) {
