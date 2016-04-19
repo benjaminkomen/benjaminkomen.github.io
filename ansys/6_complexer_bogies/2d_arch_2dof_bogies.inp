@@ -175,12 +175,12 @@ lmesh,all				!generate nodes and line elements along all selected lines
 
 !arch
 lsel,s,type,,1			!select all lines of element type 1
-lesize,all,,,3			!number of element divisions per line
+lesize,all,3			!number of element divisions per line
 lmesh,all				!generate nodes and line elements along all selected lines
 
 !hangers
 lsel,s,type,,3			!select all lines of element type 3
-lesize,all,,,3			!number of element divisions per line
+lesize,all,3			!number of element divisions per line
 lmesh,all				!generate nodes and line elements along all selected lines
 
 /input,vehicle_2dof_bogies,inp,,:meshing
