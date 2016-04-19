@@ -37,7 +37,7 @@ $(document).ready(function() {
 	var yAxis_label = ['', '|P1(f)|']
 	//first check if file exists, then push it to array to be obtained later
 	$.each(data_base_folders, function(fileNo, data_base_folder) {
-		var url_data = data_base_folder + data_sub_folder + '/' + data_file_name + '.txt';
+		var url_data = window.location.hostname + '/graphs/' + data_base_folder + data_sub_folder + '/' + data_file_name + '.txt';
 		var url_fft = data_base_folder + data_sub_folder + '/fft/' + data_file_name + '.txt';
 		console.log(checkExists(url_data));
 		if (checkExists(url_data)) { data_files1.push(url_data); }
