@@ -1,7 +1,7 @@
 !Name:			vehicle_sdof_bogies
 !Date:			April 18, 2016
 !Last modified: April 18, 2016
-!Description:	vehicle model of SDOF bogies, using secondary suspension
+!Description:	vehicle model of SDOF bogies
 
 :vars								!label
 !******************************************************************
@@ -27,7 +27,7 @@ c_pt		= 64996					!primary damping trailer bogie [Ns/m]
 k_st		= 920000				!secondary stiffnes trailer bogie [N/m]
 c_st		= 75829					!secondary damping trailer bogie [Ns/m]
 
-nv			= 2						!number of bogies
+nv			= 12					!number of bogies
 
 *dim,bog_x,,12						!bogies initial x-coordinate positions array assuming 6 part VIRM
 bog_x(1) 	= 0

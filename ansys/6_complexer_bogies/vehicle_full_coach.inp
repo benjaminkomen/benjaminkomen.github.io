@@ -1,0 +1,321 @@
+!Name:			vehicle_full_coach
+!Date:			April 18, 2016
+!Last modified: April 18, 2016
+!Description:	vehicle model of full coach
+
+:vars								!label
+!******************************************************************
+!define some input variables
+!general
+node_one 	= 1						!number of first node where bogies move
+node_end 	= nng					!number of last node where bogies move
+m_d			= 1e-8					!dummy mass [kg]
+!coaches
+m_1m		= 51500					!motor coach mass [kg]
+m_1t		= 43500					!trailer coach mass [kg]
+I_m			= 3091341				!motor coach mass moment of inertia [kg m2]
+I_t			= 2611133				!trailer coach mass moment of inertia [kg m2]
+A_co		= 1						!Cross sectional area coach [m2]
+I_co		= 10000					!Moment of inertia coach [m4]
+H_co		= 1						!Height coach [m]
+E_co		= 2.1e11				!Youngs modulus coach [N/m2]
+mu_co		= 0.2					!Poissons ratio coach
+rho_co		= 1e-8					!density coach [kg/m3]
+!motor bogie
+m_2m		= 8620					!motor frame mass [kg]
+m_3m		= 2*1200				!two motor wheelsets mass [kg]
+k_pm		= 5000000				!primary stiffness motor bogie [N/m]
+c_pm		= 103804				!primary damping motor bogie [Ns/m]
+k_sm		= 920000				!secondary stiffness motor bogie [N/m]
+c_sm		= 81670					!secondary damping motor bogie [Ns/m]
+!trailer bogie
+m_2t		= 4970					!trailer frame mass [kg]
+m_3t		= 2*1700				!two trailer wheelsets mass [kg]
+k_pt		= 3400000				!primary stiffnes trailer bogie [N/m]
+c_pt		= 64996					!primary damping trailer bogie [Ns/m]
+k_st		= 920000				!secondary stiffnes trailer bogie [N/m]
+c_st		= 75829					!secondary damping trailer bogie [Ns/m]
+
+nv			= 12					!number of bogies
+nco			= nv/2					!number of coaches
+
+*dim,bog_x,,12						!bogies initial x-coordinate positions array assuming 6 part VIRM
+bog_x(1) 	= 0
+bog_x(2) 	= -20
+bog_x(3) 	= bog_x(2)-3.55-3.05
+bog_x(4) 	= bog_x(3)-20
+bog_x(5) 	= bog_x(4)-3.05-3.55
+bog_x(6) 	= bog_x(5)-20
+bog_x(7) 	= bog_x(6)-3.55-3.05
+bog_x(8) 	= bog_x(7)-20
+bog_x(9) 	= bog_x(8)-3.05-3.55
+bog_x(10) 	= bog_x(9)-20
+bog_x(11) 	= bog_x(10)-3.55-3.05
+bog_x(12) 	= bog_x(11)-20
+
+*dim,bog_n,,nv						!bogies initial node positions array
+bog_n(1) 	= 2						!node number of bogie 1
+
+*do,i,2,nv
+	bog_n(%i%) = nint(bog_x(%i%)/dl)
+*enddo
+
+/eof								!switch back to master file
+:etypes								!label
+!******************************************************************
+!define material types
+!coach
+mp,  ex,6,E_co
+mp,nuxy,6,mu_co
+mp,dens,6,rho_co
+mp,alpx,6,alph_st
+
+!******************************************************************
+!define element types
+!define bogies
+et,4,mass21,,,4
+r,11,m_1m				!motor coach mass
+r,12,m_2m  				!motor bogie frame
+r,13,m_3m				!motor bogie wheelsets
+r,14,m_1t				!trailer coach mass
+r,15,m_2t				!trailer bogie frame
+r,16,m_3t				!trailer bogie wheelsets
+r,17,m_d				!dummy mass
+
+!define spring-damper
+et,5,combin14,,2
+r,21,k_pm,c_pm			!motor bogie primary suspension
+r,22,k_sm,c_sm			!motor bogie secondary suspension
+r,23,k_pt,c_pt			!trailer bogie primary suspension
+r,24,k_st,c_st			!trailer bogie secondary suspension
+
+!coach
+et,6,beam3
+r,6,A_co,I_co,H_co
+
+/eof
+:meshing							!label
+!******************************************************************
+!meshing
+*do,i,1,nco
+	!coach 1 and 3
+	*if,i,eq,1,or,i,eq,3,then
+		!place masses
+		type,4
+		real,16
+		n,(10000*(2*i-1)+1),abs(bog_x(2*i-1)),30	!wheels mass left
+		e,(10000*(2*i-1)+1)
+		real,13
+		n,(10000*(2*i)+1),abs(bog_x(2*i)),30	!wheels mass right
+		e,(10000*(2*i)+1)
+		real,15
+		n,(10000*(2*i-1)+2),abs(bog_x(2*i-1)),30.5	!frame mass left
+		e,(10000*(2*i-1)+2)
+		real,12
+		n,(10000*(2*i)+2),abs(bog_x(2*i)),30.5	!frame mass right
+		e,(10000*(2*i)+2)
+		real,17
+		n,(10000*(2*i-1)+3),abs(bog_x(2*i-1)),31	!dummy mass left
+		e,(10000*(2*i-1)+3)
+		n,(10000*(2*i)+3),abs(bog_x(2*i)),31	!dummy mass right
+		e,(10000*(2*i)+3)
+		real,11
+		xpos = ((abs(bog_x(2*i))+abs(bog_x(2*i-1)))/2)
+		n,(10000*(2*i-1)+4),xpos,31				!coach mass
+		e,(10000*(2*i-1)+4)
+		!place spring-dampers
+		type,5
+		real,23
+		en,(10000*(2*i-1)+2),(10000*(2*i-1)+2),(10000*(2*i-1)+1)	!left primary suspension
+		real,21
+		en,(10000*(2*i)+2),(10000*(2*i)+2),(10000*(2*i)+1)			!right primary suspension
+		real,24
+		en,(10000*(2*i-1)+3),(10000*(2*i-1)+3),(10000*(2*i-1)+2)	!left secondary suspension
+		real,22
+		en,(10000*(2*i)+3),(10000*(2*i)+3),(10000*(2*i)+2)			!right secondary suspension
+	!coach 6
+	*elseif,i,eq,6,then
+		!place masses
+		type,4
+		real,13
+		n,(10000*(2*i-1)+1),abs(bog_x(2*i-1)),30	!wheels mass left
+		e,(10000*(2*i-1)+1)
+		real,16
+		n,(10000*(2*i)+1),abs(bog_x(2*i)),30	!wheels mass right
+		e,(10000*(2*i)+1)
+		real,12
+		n,(10000*(2*i-1)+2),abs(bog_x(2*i-1)),30.5	!frame mass left
+		e,(10000*(2*i-1)+2)
+		real,15
+		n,(10000*(2*i)+2),abs(bog_x(2*i)),30.5	!frame mass right
+		e,(10000*(2*i)+2)
+		real,17
+		n,(10000*(2*i-1)+3),abs(bog_x(2*i-1)),31	!dummy mass left
+		e,(10000*(2*i-1)+3)
+		n,(10000*(2*i)+3),abs(bog_x(2*i)),31	!dummy mass right
+		e,(10000*(2*i)+3)
+		real,11
+		xpos = ((abs(bog_x(2*i))+abs(bog_x(2*i-1)))/2)
+		n,(10000*(2*i-1)+4),xpos,31				!coach mass
+		e,(10000*(2*i-1)+4)
+		!place spring-dampers
+		type,5
+		real,21
+		en,(10000*(2*i-1)+2),(10000*(2*i-1)+2),(10000*(2*i-1)+1)	!left primary suspension
+		real,23
+		en,(10000*(2*i)+2),(10000*(2*i)+2),(10000*(2*i)+1)			!right primary suspension
+		real,22
+		en,(10000*(2*i-1)+3),(10000*(2*i-1)+3),(10000*(2*i-1)+2)	!left secondary suspension
+		real,24
+		en,(10000*(2*i)+3),(10000*(2*i)+3),(10000*(2*i)+2)			!right secondary suspension
+	!the rest: coach 2,4,5
+	*else
+		!place masses
+		type,4
+		real,16
+		n,(10000*(2*i-1)+1),abs(bog_x(2*i-1)),30	!wheels mass left
+		e,(10000*(2*i-1)+1)
+		n,(10000*(2*i)+1),abs(bog_x(2*i)),30	!wheels mass right
+		e,(10000*(2*i)+1)
+		real,15
+		n,(10000*(2*i-1)+2),abs(bog_x(2*i-1)),30.5	!frame mass left
+		e,(10000*(2*i-1)+2)
+		n,(10000*(2*i)+2),abs(bog_x(2*i)),30.5	!frame mass right
+		e,(10000*(2*i)+2)
+		real,17
+		n,(10000*(2*i-1)+3),abs(bog_x(2*i-1)),31	!dummy mass left
+		e,(10000*(2*i-1)+3)
+		n,(10000*(2*i)+3),abs(bog_x(2*i)),31	!dummy mass right
+		e,(10000*(2*i)+3)
+		real,14
+		xpos = ((abs(bog_x(2*i))+abs(bog_x(2*i-1)))/2)
+		n,(10000*(2*i-1)+4),xpos,31				!coach mass
+		e,(10000*(2*i-1)+4)
+		!place spring-dampers
+		type,5
+		real,23
+		en,(10000*(2*i-1)+2),(10000*(2*i-1)+2),(10000*(2*i-1)+1)	!left primary suspension
+		en,(10000*(2*i)+2),(10000*(2*i)+2),(10000*(2*i)+1)			!right primary suspension
+		real,24
+		en,(10000*(2*i-1)+3),(10000*(2*i-1)+3),(10000*(2*i-1)+2)	!left secondary suspension
+		en,(10000*(2*i)+3),(10000*(2*i)+3),(10000*(2*i)+2)			!right secondary suspension
+	*endif
+	!place coach beam
+	type,6
+	real,6
+	mat,6
+	secnum,6
+	e,(10000*(2*i-1)+3),(10000*(2*i-1)+4)	!left beam part
+	e,(10000*(2*i-1)+4),(10000*(2*i)+3)		!right beam part
+	!constrain coach beam
+	d,(10000*(2*i-1)+3),ux					!left beam end
+	d,(10000*(2*i)+3),ux					!right beam end
+	!constrain lower mass, all DOF
+	d,(10000*(2*i-1)+1),all					!left wheels mass
+	d,(10000*(2*i)+1),all					!right wheels mass
+*enddo
+
+/eof
+:initcon						!label
+!******************************************************************
+!initial conditions
+!bogies
+*do,i,1,nco
+	!left bogie
+	uv(1,(2*i-1))=uy(10000*(2*i-1)+3)
+	vv(1,(2*i-1))=0
+	av(1,(2*i-1))=0
+	ub(1,(2*i-1))=0
+	vb(1,(2*i-1))=0
+	ab(1,(2*i-1))=0
+	!right bogie
+	uv(1,(2*i))=uy(10000*(2*i)+3)
+	vv(1,(2*i))=0
+	av(1,(2*i))=0
+	ub(1,(2*i))=0
+	vb(1,(2*i))=0
+	ab(1,(2*i))=0
+*enddo
+
+!now perform a transient analysis (default = full), first only apply a load at node 2
+timint,on						!include transient effects
+time,dt
+f,node_one+1,fy,-((m_1m+m_2t+m_3t)*g)
+outres,all,all
+solve
+
+/eof
+:mainrun						!label
+!******************************************************************
+!loop over bridge
+*do,ii,node_one+1,nn_t
+	!write data to arrays
+	t(ii)=(ii-1)*dt
+	!bridge
+	ub_mid(ii)=uy(node(l/2,0,0))
+	ub_25(ii)=uy(node(l/4,0,0))
+	
+	!bogies
+	*do,i,1,nco
+		!left bogie
+		uv(ii,(2*i-1))=uy(10000*(2*i-1)+3)
+		vv(ii,(2*i-1))=vy(10000*(2*i-1)+3)
+		av(ii,(2*i-1))=ay(10000*(2*i-1)+3)
+		!right bogie
+		uv(ii,(2*i))=uy(10000*(2*i)+3)
+		vv(ii,(2*i))=vy(10000*(2*i)+3)
+		av(ii,(2*i))=ay(10000*(2*i)+3)
+	*enddo
+	
+	*do,i,1,nv
+		!bridge deflection under bogie is bridge node deflection, if bogie is still on beam, else zero (post approach bridge no deflection)
+		*if,bog_n(i),GE,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			ub(ii,i)=uy(bog_n(i)+1)
+			vb(ii,i)=vy(bog_n(i)+1)
+			ab(ii,i)=ay(bog_n(i)+1)
+		*else
+			ub(ii,i)=0
+			vb(ii,i)=0
+			ab(ii,i)=0
+		*endif
+	*enddo
+
+	time,ii*dt
+	fdele,all,all
+
+	!move vehicles one node
+	*do,i,1,nv
+		bog_n(i) = bog_n(i)+1
+		!if bogies reach the bridge, give them node number of start bridge, not necessarily 1
+		*if,bog_n(i),eq,0,THEN
+			bog_n(i) = node_one
+		*endif
+	*enddo
+
+	!apply contact force on beam, if bogie is already/still on beam
+	*do,i,1,nv
+		*if,bog_n(i),GT,node_one,AND,bog_n(i),LE,node_end-1,THEN
+			!applied contact force depends on motor/trailer bogie and motor/trailer coach; there are 3 combinations
+			*if,i,eq,1,or,i,eq,5,then
+				f,bog_n(i),fy,(-(0.5*m_1m+m_2t+m_3t)*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
+			*elseif,i,eq,12,then
+				f,bog_n(i),fy,(-(0.5*m_1m+m_2t+m_3t)*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
+			*elseif,i,eq,2,or,i,eq,6,then
+				f,bog_n(i),fy,(-(0.5*m_1m+m_2m+m_3m)*g-m_3m*ab(ii,i)+k_pm*(uv(ii,i)-ub(ii,i))+c_pm*(vv(ii,i)-vb(ii,i)))
+			*elseif,i,eq,11,then
+				f,bog_n(i),fy,(-(0.5*m_1m+m_2m+m_3m)*g-m_3m*ab(ii,i)+k_pm*(uv(ii,i)-ub(ii,i))+c_pm*(vv(ii,i)-vb(ii,i)))
+			*else
+				f,bog_n(i),fy,(-(0.5*m_1t+m_2t+m_3t)*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
+			*endif
+		*endif
+	*enddo
+
+	!give vehicles reaction displacement
+	*do,i,1,nv
+		d,(10000*i+1),uy,ub(ii,i)
+	*enddo
+	outres,all,all
+	solve
+*enddo
+
+/eof
