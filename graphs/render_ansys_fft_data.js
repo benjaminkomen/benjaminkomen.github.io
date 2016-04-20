@@ -122,6 +122,7 @@ $(document).ready(function() {
 						options.series[i].pointInterval = timestep;
 						series_names.push(input_categories[i]);
 					}
+					console.log('series names are:' + series_names[0] + series_names[1]);
 				}
 				// the rest of the lines contain data, put them in series
 				else {
