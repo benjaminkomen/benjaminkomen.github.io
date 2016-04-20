@@ -3,6 +3,7 @@
  * Last modified:	April 19, 2016
  * Description:		Make 2 graphs with ansys data and fft of it below
  */
+window.series_names = [];
 $(document).ready(function() {
 	//define function to read url parameters
 	function getParameterByName(name, url) {
@@ -22,7 +23,6 @@ $(document).ready(function() {
 	$("h2#title").html('Folder: ' + data_sub_folder + ' file: ' + data_file_name + '; time history and fast fourier transform');
 	var data_files1 = [];
 	var data_files2 = [];
-	window.series_names = [];
 	var graph_name = [data_sub_folder, data_sub_folder + '_fft'];
 	var xAxis_label = ['Time [s]', 'Frequency [Hz]'];
 	var yAxis_label = ['', 'Amplitude']
