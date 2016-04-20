@@ -137,14 +137,11 @@ $(document).ready(function() {
 			return series_names;
 			});
 			console.log(options.series);
-			console.log('1 series names are:' + series_names[0] + series_names[1]);
 			var chart = new Highcharts.Chart(options);
-			return series_names;
 		},
 		"text");
-		return series_names;
 		});
-	console.log('2 series names are:' + series_names[0] + series_names[1]);
+		
 	//loop through fft data files and preprocess data to plot graph
 	$.each(data_files2, function(fileNo, data_file) {
 		var container = 'container1';
@@ -194,13 +191,15 @@ $(document).ready(function() {
 		$.get(data_file, function(data) {
 			// Split the lines
 			var lines = data.split('\n');
+			var input_categories = ['ub_mid','ub_quart'];
 			
-			//create object structure for data series
-			options.series.push({
-				name: series_names[fileNo],
-				data: []
-			});
-			
+			//create an object for every input_category in the series array
+			for (i=0;i<input_categories.length;i++) {
+				options.series.push({
+					name: input_categories[i],
+					data: []
+				})
+			}
 			// Iterate over the lines and add to series
 			$.each(lines, function(lineNo, line) {
 				//exclude first and empty lines
