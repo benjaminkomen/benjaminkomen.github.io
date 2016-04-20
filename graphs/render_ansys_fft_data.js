@@ -19,16 +19,17 @@ $(document).ready(function() {
 	var data_sub_folder = getParameterByName('folder');
 	var data_file_name = getParameterByName('file');
 	var data_base_folder = 'ansys-data/';
-	$("h2#title").html('Folder: ' + data_sub_folder + ' file: ' + data_file_name + ' time history and fast fourier transform');
+	$("h2#title").html('Folder: ' + data_sub_folder + ' file: ' + data_file_name + '; time history and fast fourier transform');
 	var data_files1 = [];
 	var data_files2 = [];
+	var series_names = [];
 	var graph_name = [data_sub_folder, data_sub_folder + '_fft'];
 	var xAxis_label = ['Time [s]', 'Frequency [Hz]'];
-	var yAxis_label = ['', '|P1(f)|']
+	var yAxis_label = ['', 'Amplitude']
 	data_files1.push(data_base_folder + data_sub_folder + '/' + data_file_name + '.txt');
 	data_files2.push(data_base_folder + data_sub_folder + '/fft/' + data_file_name + '.txt');
 	
-	//loop through matlabs/ansys data files and preprocess data to plot graph
+	//loop through ansys data files and preprocess data to plot graph
 	$.each(data_files1, function(fileNo, data_file) {
 		var container = 'container0';
 		
@@ -119,6 +120,7 @@ $(document).ready(function() {
 						})
 						//put timestep as pointInterval for every input_category
 						options.series[i].pointInterval = timestep;
+						series_names.push(input_categories[i]);
 					}
 				}
 				// the rest of the lines contain data, put them in series

@@ -8,7 +8,7 @@ clear all;
 clc;
 
 % read data into array using third-party script
-file_name	= '3';
+file_name	= '0';
 file_ext	= '.txt';
 file_path	= '../ansys-data/vehicle_two_1dofs/';
 input_path	= strcat(file_path, file_name, file_ext);
@@ -17,28 +17,30 @@ input_path	= strcat(file_path, file_name, file_ext);
 head_lines  = strsplit(hl,'\n');
 timestep1   = strsplit(head_lines{1},':');
 dt          = str2num(timestep1{2});            % read timestep from header lines [s]
-
-acc_vec		= data_array(:,1);					% input data points, only takes first column [?]
 Fs			= 1/dt;								% Sampling frequency [Hz = 1/s]
+data_ser_cell = strsplit(head_lines{4},',');    % contains data series
+amplitude     = [];                               % define array
 
-L  			= length(acc_vec);					% length of vector [-]
-%max_time    = (L-1)*timestep;                   % max time value [s]
-%time_vec	= 0:timestep:max_time;              % vector of equally spaced time steps
+%loop through columns of data
+for k=1:length(data_ser_cell)
+    data_series = strtrim(data_ser_cell{k});
+    acc_vec		= data_array(:,k);					% input data points
+    L  			= length(acc_vec);					% length of vector [-]
+    acc_fft		= fft(acc_vec);						% compute fft [?]
+    P2          = abs(acc_fft/L);					% two-sided spectrum [?]
+    P1          = P2(1:L/2+1);						% one-sided spectrum [?]
+    P1(2:end-1) = 2*P1(2:end-1);					% ?
+    amplitude   = [amplitude P1];
+    f           = (Fs*(0:(L/2))/L)';         		% frequency vector [Hz]
+end
 
-acc_fft		= fft(acc_vec);						% compute fft [?]
-
-P2       = abs(acc_fft/L);						% two-sided spectrum [?]
-P1       = P2(1:L/2+1);							% one-sided spectrum [?]
-P1(2:end-1) = 2*P1(2:end-1);					% ?
-
-f        = Fs*(0:(L/2))/L;						% frequency vector [Hz]
-T        = table([f.'],[P1]);					% define output matrix
+T        = table([f],[amplitude]);					% define output matrix
 
 % write results to file
 output_path = strcat(file_path, 'fft/', file_name, file_ext); %output file name
 writetable(T,output_path);                      % write to file
 
-plot(f,P1)
-title('Single-Sided Amplitude Spectrum of acceleration')
-xlabel('f (Hz)')
-ylabel('|P1(f)|')
+plot(f,amplitude)
+%title('Single-Sided Amplitude Spectrum of acceleration')
+%xlabel('f (Hz)')
+%ylabel('|P1(f)|')
