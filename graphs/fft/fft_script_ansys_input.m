@@ -8,7 +8,7 @@ clear all;
 clc;
 
 % read data into array using third-party script
-file_name	= '0';
+file_name	= '3';
 file_ext	= '.txt';
 file_path	= '../ansys-data/vehicle_two_1dofs/';
 input_path	= strcat(file_path, file_name, file_ext);
@@ -24,16 +24,17 @@ amplitude     = [];                               % define array
 %loop through columns of data
 for k=1:length(data_ser_cell)
     data_series = strtrim(data_ser_cell{k});
-    acc_vec		= data_array(:,k);					% input data points
-    L  			= length(acc_vec);					% length of vector [-]
-    acc_fft		= fft(acc_vec);						% compute fft [?]
-    P2          = abs(acc_fft/L);					% two-sided spectrum [?]
-    P1          = P2(1:L/2+1);						% one-sided spectrum [?]
-    P1(2:end-1) = 2*P1(2:end-1);					% ?
-    amplitude   = [amplitude P1];
-    f           = (Fs*(0:(L/2))/L)';         		% frequency vector [Hz]
+    if (isempty(data_series) == 0)              %proceed if not empty
+        acc_vec		= data_array(:,k);					% input data points
+        L  			= length(acc_vec);					% length of vector [-]
+        acc_fft		= fft(acc_vec);						% compute fft [?]
+        P2          = abs(acc_fft/L);					% two-sided spectrum [?]
+        P1          = P2(1:L/2+1);						% one-sided spectrum [?]
+        P1(2:end-1) = 2*P1(2:end-1);					% ?
+        amplitude   = [amplitude P1];
+        f           = (Fs*(0:(L/2))/L)';         		% frequency vector [Hz]
+    end
 end
-
 T        = table([f],[amplitude]);					% define output matrix
 
 % write results to file
