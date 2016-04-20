@@ -121,8 +121,7 @@ $(document).ready(function() {
 						//put timestep as pointInterval for every input_category
 						options.series[i].pointInterval = timestep;
 						series_names.push(input_categories[i]);
-					}
-					console.log('series names are:' + series_names[0] + series_names[1]);
+					
 				}
 				// the rest of the lines contain data, put them in series
 				else {
@@ -139,8 +138,9 @@ $(document).ready(function() {
 			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 			},
-		"text");
-	});
+			"text");
+			return series_names;			
+		});
 	console.log('series names are:' + series_names[0] + series_names[1]);
 	//loop through fft data files and preprocess data to plot graph
 	$.each(data_files2, function(fileNo, data_file) {
