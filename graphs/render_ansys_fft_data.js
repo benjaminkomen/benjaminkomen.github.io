@@ -140,7 +140,7 @@ $(document).ready(function() {
 			},
 		"text");
 	});
-	
+	console.log('series names are:' + series_names[0] + series_names[1]);
 	//loop through fft data files and preprocess data to plot graph
 	$.each(data_files2, function(fileNo, data_file) {
 		var container = 'container1';
@@ -193,7 +193,7 @@ $(document).ready(function() {
 			
 			//create object structure for data series
 			options.series.push({
-				name: graph_name[fileNo],
+				name: series_names[fileNo],
 				data: []
 			});
 			
@@ -203,8 +203,12 @@ $(document).ready(function() {
 				if (line != "" && lineNo != 0) {
 					var items = line.split(',');
 					freq_entry = parseFloat(items[0]);
-					ampl_entry = parseFloat(items[1]);
-					options.series[0].data.push([freq_entry, ampl_entry]);
+					$.each(items, function(itemNo, item) {
+						if (itemNo != 0) {
+							cur_series = itemNo - 1; //because we skip item 0 
+							options.series[cur_series].data.push([freq_entry, parseFloat(item)]);
+						}
+					});
 				}
 			});
 			console.log(options.series);
