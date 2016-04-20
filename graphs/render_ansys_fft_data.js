@@ -141,7 +141,9 @@ $(document).ready(function() {
 		},
 		"text");
 		});
-	console.log(window.series_names);
+	setTimeout(function(){
+		console.log(window.series_names);
+	},1500);
 	//loop through fft data files and preprocess data to plot graph
 	$.each(data_files2, function(fileNo, data_file) {
 		var container = 'container1';
