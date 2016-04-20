@@ -120,7 +120,7 @@ $(document).ready(function() {
 						})
 						//put timestep as pointInterval for every input_category
 						options.series[i].pointInterval = timestep;
-						series_names.push(input_categories[i]);
+						window.series_names.push(input_categories[i]);
 					}
 				}
 				// the rest of the lines contain data, put them in series
@@ -134,14 +134,13 @@ $(document).ready(function() {
 						});
 					}
 				}
-			return series_names;
 			});
 			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 		},
 		"text");
 		});
-		
+	console.log(window.series_names);
 	//loop through fft data files and preprocess data to plot graph
 	$.each(data_files2, function(fileNo, data_file) {
 		var container = 'container1';
