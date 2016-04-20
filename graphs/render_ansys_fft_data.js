@@ -139,8 +139,10 @@ $(document).ready(function() {
 			console.log(options.series);
 			console.log('1 series names are:' + series_names[0] + series_names[1]);
 			var chart = new Highcharts.Chart(options);
-			},
+			return series_names;
+		},
 		"text");
+		return series_names;
 		});
 	console.log('2 series names are:' + series_names[0] + series_names[1]);
 	//loop through fft data files and preprocess data to plot graph
