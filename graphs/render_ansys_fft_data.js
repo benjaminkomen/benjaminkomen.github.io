@@ -3,7 +3,6 @@
  * Last modified:	April 19, 2016
  * Description:		Make 2 graphs with ansys data and fft of it below
  */
-window.series_names = [];
 $(document).ready(function() {
 	//define function to read url parameters
 	function getParameterByName(name, url) {
@@ -23,6 +22,7 @@ $(document).ready(function() {
 	$("h2#title").html('Folder: ' + data_sub_folder + ' file: ' + data_file_name + '; time history and fast fourier transform');
 	var data_files1 = [];
 	var data_files2 = [];
+	var series_names = [];
 	var graph_name = [data_sub_folder, data_sub_folder + '_fft'];
 	var xAxis_label = ['Time [s]', 'Frequency [Hz]'];
 	var yAxis_label = ['', 'Amplitude']
@@ -120,7 +120,7 @@ $(document).ready(function() {
 						})
 						//put timestep as pointInterval for every input_category
 						options.series[i].pointInterval = timestep;
-						window.series_names.push(input_categories[i]);
+						series_names.push(input_categories[i]);
 					}
 				}
 				// the rest of the lines contain data, put them in series
@@ -135,7 +135,6 @@ $(document).ready(function() {
 					}
 				}
 			});
-			console.log(window.series_names);
 			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 		},
@@ -191,12 +190,11 @@ $(document).ready(function() {
 			$.get(data_file, function(data) {
 				// Split the lines
 				var lines = data.split('\n');
-				//var input_categories = ['ub_mid','ub_quart'];
 				
 				//create an object for every input_category in the series array
-				for (i=0;i<window.series_names.length;i++) {
+				for (i=0;i<series_names.length;i++) {
 					options.series.push({
-						name: window.series_names[i],
+						name: series_names[i],
 						data: []
 					})
 				}
