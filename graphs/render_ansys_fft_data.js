@@ -141,84 +141,83 @@ $(document).ready(function() {
 		},
 		"text");
 		});
-	setTimeout(function(){
-		console.log(window.series_names);
-	},1500);
-	//loop through fft data files and preprocess data to plot graph
-	$.each(data_files2, function(fileNo, data_file) {
-		var container = 'container1';
-		
-		//create options variable
-		var options = {
-			chart: {
-				renderTo: container,
-				type:'line',
-				zoomType: 'x'
-			},
-			title: {
-				text: graph_name[1]
-			},
-			subtitle: {
-					text: document.ontouchstart === undefined ?
-							'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-			},
-			tooltip: {
-				positioner: function () {
-					return { x: 80, y: 50 };
-				},
-				valueDecimals: 5,
-				shadow: false,
-				borderWidth: 0,
-				backgroundColor: 'rgba(255,255,255,0.8)'
-			},
-			xAxis: {
-				title: {
-					enabled: true,
-					text: xAxis_label[1]
-				},
-				//categories: [],
-				startOnTick: true,
-				endOnTick: true,
-				showLastLabel: true
-			},
-			yAxis: {
-				title: {
-					text: yAxis_label[1]
-				}
-			},
-			series: []
-		};
-		
-		//Load the data file and add correct data items to array
-		$.get(data_file, function(data) {
-			// Split the lines
-			var lines = data.split('\n');
-			var input_categories = ['ub_mid','ub_quart'];
+	setTimeout(function(){	
+		//loop through fft data files and preprocess data to plot graph
+		$.each(data_files2, function(fileNo, data_file) {
+			var container = 'container1';
 			
-			//create an object for every input_category in the series array
-			for (i=0;i<input_categories.length;i++) {
-				options.series.push({
-					name: input_categories[i],
-					data: []
-				})
-			}
-			// Iterate over the lines and add to series
-			$.each(lines, function(lineNo, line) {
-				//exclude first and empty lines
-				if (line != "" && lineNo != 0) {
-					var items = line.split(',');
-					freq_entry = parseFloat(items[0]);
-					$.each(items, function(itemNo, item) {
-						if (itemNo != 0) {
-							cur_series = itemNo - 1; //because we skip item 0 
-							options.series[cur_series].data.push([freq_entry, parseFloat(item)]);
-						}
-					});
+			//create options variable
+			var options = {
+				chart: {
+					renderTo: container,
+					type:'line',
+					zoomType: 'x'
+				},
+				title: {
+					text: graph_name[1]
+				},
+				subtitle: {
+						text: document.ontouchstart === undefined ?
+								'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+				},
+				tooltip: {
+					positioner: function () {
+						return { x: 80, y: 50 };
+					},
+					valueDecimals: 5,
+					shadow: false,
+					borderWidth: 0,
+					backgroundColor: 'rgba(255,255,255,0.8)'
+				},
+				xAxis: {
+					title: {
+						enabled: true,
+						text: xAxis_label[1]
+					},
+					//categories: [],
+					startOnTick: true,
+					endOnTick: true,
+					showLastLabel: true
+				},
+				yAxis: {
+					title: {
+						text: yAxis_label[1]
+					}
+				},
+				series: []
+			};
+			
+			//Load the data file and add correct data items to array
+			$.get(data_file, function(data) {
+				// Split the lines
+				var lines = data.split('\n');
+				//var input_categories = ['ub_mid','ub_quart'];
+				
+				//create an object for every input_category in the series array
+				for (i=0;i<window.series_names.length;i++) {
+					options.series.push({
+						name: window.series_names[i],
+						data: []
+					})
 				}
-			});
-			console.log(options.series);
-			var chart = new Highcharts.Chart(options);
-			},
-		"text");
-	});
+				// Iterate over the lines and add to series
+				$.each(lines, function(lineNo, line) {
+					//exclude first and empty lines
+					if (line != "" && lineNo != 0) {
+						var items = line.split(',');
+						freq_entry = parseFloat(items[0]);
+						$.each(items, function(itemNo, item) {
+							if (itemNo != 0) {
+								cur_series = itemNo - 1; //because we skip item 0 
+								options.series[cur_series].data.push([freq_entry, parseFloat(item)]);
+							}
+						});
+					}
+				});
+				console.log(options.series);
+				var chart = new Highcharts.Chart(options);
+				},
+			"text");
+		});
+	},1000);
 });
