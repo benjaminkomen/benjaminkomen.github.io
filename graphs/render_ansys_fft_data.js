@@ -22,7 +22,7 @@ $(document).ready(function() {
 	$("h2#title").html('Folder: ' + data_sub_folder + ' file: ' + data_file_name + '; time history and fast fourier transform');
 	var data_files1 = [];
 	var data_files2 = [];
-	var window.series_names = [];
+	window.series_names = [];
 	var graph_name = [data_sub_folder, data_sub_folder + '_fft'];
 	var xAxis_label = ['Time [s]', 'Frequency [Hz]'];
 	var yAxis_label = ['', 'Amplitude']
