@@ -135,6 +135,7 @@ $(document).ready(function() {
 					}
 				}
 			});
+			console.log(window.series_names);
 			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 		},
