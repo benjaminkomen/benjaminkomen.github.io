@@ -137,11 +137,12 @@ $(document).ready(function() {
 			});
 			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
+			return series_names;
 			},
 		"text");
-		return series_names;			
+		console.log('1 series names are:' + series_names[0] + series_names[1]);
 		});
-	console.log('series names are:' + series_names[0] + series_names[1]);
+	console.log('2 series names are:' + series_names[0] + series_names[1]);
 	//loop through fft data files and preprocess data to plot graph
 	$.each(data_files2, function(fileNo, data_file) {
 		var container = 'container1';
