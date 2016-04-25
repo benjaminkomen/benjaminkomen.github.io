@@ -1,12 +1,13 @@
 !Name:			vehicle_2dof_bogies
 !Date:			April 18, 2016
-!Last modified: April 18, 2016
+!Last modified: April 22, 2016
 !Description:	vehicle model of SDOF bogies, using secondary suspension
 
 :vars								!label
 !******************************************************************
 !define some input variables
 !general
+gamma_d		= 0.1					!Gamma, numerical damping in HHT
 node_one 	= 1						!number of first node where bogies move
 node_end 	= nng					!number of last node where bogies move
 !coaches
@@ -27,7 +28,7 @@ c_pt		= 64996					!primary damping trailer bogie [Ns/m]
 k_st		= 920000				!secondary stiffnes trailer bogie [N/m]
 c_st		= 75829					!secondary damping trailer bogie [Ns/m]
 
-nv			= 2						!number of bogies
+nv			= 12						!number of bogies
 
 *dim,bog_x,,12						!bogies initial x-coordinate positions array assuming 6 part VIRM
 bog_x(1) 	= 0
@@ -166,6 +167,8 @@ r,24,k_st,c_st			!trailer bogie secondary suspension
 
 !now perform a transient analysis (default = full), first only apply a load at node 2
 timint,on						!include transient effects
+trnopt,,,,,,hht					!use HHT instead of Newmark
+tintp,gamma_d					!damp out numerical noise
 time,dt
 f,node_one+1,fy,-((m_1m+m_2t+m_3t)*g)
 outres,all,all

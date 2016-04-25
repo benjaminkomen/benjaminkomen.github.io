@@ -1,12 +1,13 @@
 !Name:			vehicle_full_coach
 !Date:			April 18, 2016
-!Last modified: April 18, 2016
+!Last modified: April 22, 2016
 !Description:	vehicle model of full coach
 
 :vars								!label
 !******************************************************************
 !define some input variables
 !general
+gamma_d		= 0.1					!Gamma, numerical damping in HHT
 node_one 	= 1						!number of first node where bogies move
 node_end 	= nng					!number of last node where bogies move
 m_d			= 1e-8					!dummy mass [kg]
@@ -239,6 +240,8 @@ r,6,A_co,I_co,H_co
 
 !now perform a transient analysis (default = full), first only apply a load at node 2
 timint,on						!include transient effects
+trnopt,,,,,,hht					!use HHT instead of Newmark
+tintp,gamma_d					!damp out numerical noise
 time,dt
 f,node_one+1,fy,-((m_1m+m_2t+m_3t)*g)
 outres,all,all

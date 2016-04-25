@@ -1,14 +1,13 @@
 !Name:			vehicle_sdof_bogies
 !Date:			April 18, 2016
-!Last modified: April 18, 2016
+!Last modified: April 25, 2016
 !Description:	vehicle model of SDOF bogies
 
 :vars								!label
 !******************************************************************
 !define some input variables
 !general
-node_one 	= 1						!number of first node where bogies move
-node_end 	= nng					!number of last node where bogies move
+gamma_d		= 0.1					!Gamma, numerical damping in HHT
 !coaches
 m_1m		= 0.5*51500				!motor coach mass [kg]
 m_1t		= 0.5*43500				!trailer coach mass [kg]
@@ -27,7 +26,7 @@ c_pt		= 64996					!primary damping trailer bogie [Ns/m]
 k_st		= 920000				!secondary stiffnes trailer bogie [N/m]
 c_st		= 75829					!secondary damping trailer bogie [Ns/m]
 
-nv			= 12					!number of bogies
+nv			= 2						!number of bogies
 
 *dim,bog_x,,12						!bogies initial x-coordinate positions array assuming 6 part VIRM
 bog_x(1) 	= 0
@@ -164,10 +163,22 @@ r,23,k_st,c_st			!trailer bogie secondary suspension
 	ab(1,i)=0
 *enddo
 
+!determine node numbers on vehicle path_br, backwards compatible with 2d bridge
+*dim,path_br,,nng
+cur_x = 0
+*do,i,1,nng
+	path_br(i) = node(cur_x,0,7.15)
+	cur_x = cur_x + dl
+*enddo
+
+*dim,mask,,elmiqr(0,14)
+
 !now perform a transient analysis (default = full), first only apply a load at node 2
 timint,on						!include transient effects
+trnopt,,,,,,hht					!use HHT instead of Newmark
+tintp,gamma_d					!damp out numerical noise
 time,dt
-f,node_one+1,fy,-((m_1m+m_2t+m_3t)*g)
+f,path_br(2),fy,-((m_1m+m_2t+m_3t)*g)
 outres,all,all
 solve
 
@@ -175,7 +186,7 @@ solve
 :mainrun						!label
 !******************************************************************
 !loop over bridge
-*do,ii,node_one+1,nn_t
+*do,ii,2,nn_t
 	!write data to arrays
 	t(ii)=(ii-1)*dt
 	!bridge
@@ -189,10 +200,10 @@ solve
 		av(ii,i)=ay(10000*i+3)
 		
 		!bridge deflection under bogie is bridge node deflection, if bogie is still on beam, else zero (post approach bridge no deflection)
-		*if,bog_n(i),GE,node_one,AND,bog_n(i),LE,node_end-1,THEN
-			ub(ii,i)=uy(bog_n(i)+1)
-			vb(ii,i)=vy(bog_n(i)+1)
-			ab(ii,i)=ay(bog_n(i)+1)
+		*if,bog_n(i),GE,path_br(1),AND,bog_n(i),LE,path_br(nng-1),THEN
+			ub(ii,i)=uy(bog_n(i))
+			vb(ii,i)=vy(bog_n(i))
+			ab(ii,i)=ay(bog_n(i))
 		*else
 			ub(ii,i)=0
 			vb(ii,i)=0
@@ -205,16 +216,24 @@ solve
 
 	!move vehicles one node
 	*do,i,1,nv
-		bog_n(i) = bog_n(i)+1
-		!if bogies reach the bridge, give them node number of start bridge, not necessarily 1
-		*if,bog_n(i),eq,0,THEN
-			bog_n(i) = node_one
+		*if,bog_n(i),LT,0,OR,bog_n(i),GE,path_br(nng-1),THEN
+			!if bogies are before/past bridge, increment with 1
+			bog_n(i) = bog_n(i)+1
+		*elseif,bog_n(i),eq,0,THEN
+			!if bogies reach the bridge, give them node number of start bridge, not necessarily 1
+			bog_n(i) = path_br(1)
+		*else
+			!if bogies are on the bridge, give them next node number in vehicle path_br
+			scal = bog_n(i)
+			*voper,mask(1),path_br(1),eq,scal		!find location of bog_n(i) in vector path_br()
+			*vscfun,location,lmax,mask(1)
+			bog_n(i) = path_br(location+1)
 		*endif
 	*enddo
 
 	!apply contact force on beam, if bogie is already/still on beam
 	*do,i,1,nv
-		*if,bog_n(i),GT,node_one,AND,bog_n(i),LE,node_end-1,THEN
+		*if,bog_n(i),GE,path_br(1),AND,bog_n(i),LE,path_br(nng-1),THEN
 			!applied contact force depends on motor/trailer bogie and motor/trailer coach; there are 3 combinations
 			*if,i,eq,1,or,i,eq,5,then
 				f,bog_n(i),fy,(-(m_1m+m_2t+m_3t)*g-m_3t*ab(ii,i)+k_pt*(uv(ii,i)-ub(ii,i))+c_pt*(vv(ii,i)-vb(ii,i)))
