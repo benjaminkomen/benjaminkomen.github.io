@@ -182,17 +182,17 @@ $(document).ready(function() {
 						if (line != "") {
 							var items = line.split(',');
 							$.each(items, function(itemNo, item) {
-							//console.log("currently looking at series " + options.series.name);
 							//check if item exists and is a number
 							if(!isNaN(item) && $.trim(item)) {
 								if(!bogies) {
 									var cat_nr = iterate_start + itemNo;
 									options.series[cat_nr].data.push(parseFloat(item));
+								} else if(bridge_graph) {
+									var cat_nr = iterate_start + itemNo;
+									options.series[cat_nr].data.push(parseFloat(item));
 								} else {
 									if(itemNo+1 == bogies) {
-										var cat_nr = iterate_start + itemNo + 1;
-										console.log(cat_nr);
-										options.series[cat_nr].data.push(parseFloat(item));
+										options.series[0].data.push(parseFloat(item));
 									}
 								}
 							}
