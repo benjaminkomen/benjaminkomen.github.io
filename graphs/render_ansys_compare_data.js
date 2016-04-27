@@ -152,9 +152,12 @@ $(document).ready(function() {
 							//check if item exists and not an empty space after the last comma
 							if($.trim(item)) {
 								//use the old way if no specific bogie number is defined or if bridge deflection graph is plotted
-								if(!bogies || ansys_sub_folder[k].match(/ub/gi)) {
+								if(!bogies) {
 									input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
 									console.log("bogies is undefined");
+								} else if(ansys_sub_folder[k].match(/ub/gi)) {
+									console.log("we are at bridge deflection graph");
+									input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
 								} else {
 									if(itemNo+1 == bogies) {
 										console.log("bogie is defined, pushing item");
