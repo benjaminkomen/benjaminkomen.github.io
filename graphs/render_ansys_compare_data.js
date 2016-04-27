@@ -151,6 +151,7 @@ $(document).ready(function() {
 						$.each(items, function(itemNo, item) {
 							//check if item exists and not an empty space after the last comma
 							if($.trim(item)) {
+								console.log("analysing " + ansys_sub_folder[k]);
 								//use the old way if no specific bogie number is defined or if bridge deflection graph is plotted
 								if(!bogies) {
 									input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
