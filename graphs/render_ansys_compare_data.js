@@ -187,7 +187,8 @@ $(document).ready(function() {
 									options.series[cat_nr].data.push(parseFloat(item));
 								} else {
 									if(itemNo+1 == bogies) {
-										var cat_nr = iterate_start + itemNo;
+										var cat_nr = iterate_start + itemNo + 1;
+										console.log(options.series[cat_nr]);
 										options.series[cat_nr].data.push(parseFloat(item));
 									}
 								}
