@@ -1,6 +1,6 @@
 /* Name:			render_ansys_compare_data
  * Date: 			April 15, 2016
- * Last modified:	April 15, 2016
+ * Last modified:	April 27, 2016
  * Description:		Make 4 graphs with comparison between multiple ansys datasets
  */
 $(document).ready(function() {
@@ -32,9 +32,10 @@ $(document).ready(function() {
 		}
 	}
 	
-	//count how many parameters in url
+	//count how many name parameters in url
 	var url = window.location.href;
-	var matches = url.match(/[a-z\d]+=[a-z\d]+/gi);
+	//var matches = url.match(/[a-z\d]+=[a-z\d]+/gi);
+	var matches = url.match(/name/gi);
 	var count = matches? matches.length : 0;
 	
 	//define input parameters
@@ -43,6 +44,7 @@ $(document).ready(function() {
 	var name;
 	var data_files = {};
 	var data_file = [];
+	var bogie_nr = parseInt(getParameterByName(bogie_nr));
 	for (i=0;i<count;i++) {
 		name = 'name' + i;
 		ansys_sub_folder.push(getParameterByName(name));	//add to array
