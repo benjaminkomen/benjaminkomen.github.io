@@ -45,7 +45,7 @@ $(document).ready(function() {
 	var name;
 	var data_files = {};
 	var data_file = [];
-	var bogie_nr = parseInt(getParameterByName(bogie_nr));
+	var bogies = parseInt(getParameterByName("bogie_nr"));
 	console.log(bogie_nr);
 	for (i=0;i<count;i++) {
 		name = 'name' + i;
