@@ -45,9 +45,9 @@ $(document).ready(function() {
 	var name;
 	var data_files = {};
 	var data_file = [];
-	var bogie_nr;
-	var bogies = parseInt(getParameterByName(bogie_nr));
-	console.log(bogie_nr);
+	var bogienr;
+	var bogies = parseInt(getParameterByName(bogienr));
+	console.log(bogienr);
 	for (i=0;i<count;i++) {
 		name = 'name' + i;
 		ansys_sub_folder.push(getParameterByName(name));	//add to array
