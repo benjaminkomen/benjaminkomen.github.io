@@ -66,6 +66,13 @@ $(document).ready(function() {
 	//loop through ansys data files and preprocess data to plot graph
 	$.each(data_files[0], function(fileNo, data_file0) {
 		var container = 'container' + fileNo;
+		//set global parameter bridge_graph to true or false
+		if(fileNo == 0) {
+			bridge_graph = true;
+		} else {
+			bridge_graph = false;
+		}
+		console.log("file number is " + fileNo + " and bridge_graph is " + bridge_graph);
 		//create options variable
 		var options = {
 			chart: {
