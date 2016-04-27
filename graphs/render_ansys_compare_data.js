@@ -154,7 +154,7 @@ $(document).ready(function() {
 								if(!bogies) {
 									input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
 								} else {
-									if(itemNo == bogies) {
+									if(itemNo+1 == bogies) {
 										input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
 									}
 								}
@@ -183,7 +183,7 @@ $(document).ready(function() {
 									var cat_nr = iterate_start + itemNo;
 									options.series[cat_nr].data.push(parseFloat(item));
 								} else {
-									if(itemNo == bogies) {
+									if(itemNo+1 == bogies) {
 										var cat_nr = iterate_start + itemNo;
 										options.series[cat_nr].data.push(parseFloat(item));
 									}
