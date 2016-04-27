@@ -36,9 +36,7 @@ $(document).ready(function() {
 	var url = window.location.href;
 	//var matches = url.match(/[a-z\d]+=[a-z\d]+/gi);
 	var matches = url.match(/name/gi);
-	console.log(matches);
 	var count = matches? matches.length : 0;
-	console.log(count);
 	//define input parameters
 	var ansys_base_folder = 'ansys-data/';
 	var ansys_sub_folder = [];
@@ -46,6 +44,7 @@ $(document).ready(function() {
 	var data_files = {};
 	var data_file = [];
 	var bogie_nr = parseInt(getParameterByName(bogie_nr));
+	console.log(bogie_nr);
 	for (i=0;i<count;i++) {
 		name = 'name' + i;
 		ansys_sub_folder.push(getParameterByName(name));	//add to array
@@ -55,6 +54,7 @@ $(document).ready(function() {
 			data_files[i].push(ansys_base_folder + ansys_sub_folder[i] + '/' + j + '.txt');
 		}
 	}
+	console.log(data_files);
 	var ansys_title = ansys_sub_folder.toString();
 	$("h2#title").html('Compare Ansys runs: ' + ansys_title);
 	
