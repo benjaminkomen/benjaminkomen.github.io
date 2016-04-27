@@ -153,8 +153,10 @@ $(document).ready(function() {
 							if($.trim(item)) {
 								if(!bogies) {
 									input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
+									console.log("bogies is undefined");
 								} else {
 									if(itemNo+1 == bogies) {
+										console.log("bogie is defined, pushing item");
 										input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
 									}
 								}
