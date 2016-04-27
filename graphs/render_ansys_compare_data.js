@@ -7,8 +7,10 @@ $(document).ready(function() {
 	//define function to read url parameters
 	function getParameterByName(name, url) {
     if (!url) url = window.location.href;
-    url = url.toLowerCase(); // This is just to avoid case sensitiveness  
+    url = url.toLowerCase(); // This is just to avoid case sensitiveness
+	console.log(url);
     name = name.replace(/[\[\]]/g, "\\$&").toLowerCase();// This is just to avoid case sensitiveness for query parameter name
+	console.log(name);
     var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
         results = regex.exec(url);
     if (!results) return null;
