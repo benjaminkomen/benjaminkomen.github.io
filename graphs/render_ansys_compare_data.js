@@ -174,6 +174,7 @@ $(document).ready(function() {
 							//put timestep as pointInterval for every input_category
 							options.series[i].pointInterval = timestep;
 						}
+						console.log(options.series);
 					}
 					// the rest of the lines contain data, put them in series
 					else {
@@ -181,7 +182,7 @@ $(document).ready(function() {
 						if (line != "") {
 							var items = line.split(',');
 							$.each(items, function(itemNo, item) {
-							console.log("currently looking at series " + options.series.name);
+							//console.log("currently looking at series " + options.series.name);
 							//check if item exists and is a number
 							if(!isNaN(item) && $.trim(item)) {
 								if(!bogies) {
@@ -190,7 +191,7 @@ $(document).ready(function() {
 								} else {
 									if(itemNo+1 == bogies) {
 										var cat_nr = iterate_start + itemNo + 1;
-										console.log(options.series[cat_nr]);
+										console.log(cat_nr);
 										options.series[cat_nr].data.push(parseFloat(item));
 									}
 								}
@@ -201,7 +202,7 @@ $(document).ready(function() {
 				});
 				iterate_start = options.series.length;
 			}
-			console.log(options.series);
+			//console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 			},
 		"text");
