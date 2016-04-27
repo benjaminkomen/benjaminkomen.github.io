@@ -125,6 +125,7 @@ $(document).ready(function() {
 			var input_categories = [];
 			var timestep = '';
 			var iterate_start = 0;
+			//do the following stuff for every file to compare, k is the amount of files, e.g. if comparing name0 and name1 than k = 2
 			for (k=0;k<count;k++) {
 				// Iterate over the ansys lines and add categories or series
 				$.each(lines[k], function(lineNo, line) {
@@ -175,7 +176,6 @@ $(document).ready(function() {
 							//put timestep as pointInterval for every input_category
 							options.series[i].pointInterval = timestep;
 						}
-						console.log(options.series);
 					}
 					// the rest of the lines contain data, put them in series
 					else {
@@ -193,7 +193,7 @@ $(document).ready(function() {
 									options.series[cat_nr].data.push(parseFloat(item));
 								} else {
 									if(itemNo+1 == bogies) {
-										options.series[0].data.push(parseFloat(item));
+										options.series[k].data.push(parseFloat(item));
 									}
 								}
 							}
@@ -203,7 +203,7 @@ $(document).ready(function() {
 				});
 				iterate_start = options.series.length;
 			}
-			//console.log(options.series);
+			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 			},
 		"text");
