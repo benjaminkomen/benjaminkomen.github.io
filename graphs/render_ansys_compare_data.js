@@ -49,6 +49,7 @@ $(document).ready(function() {
 	var data_files = {};
 	var data_file = [];
 	var bogies = parseInt(getParameterByName("bogienr"));
+	var bridge_graph = false;
 	for (i=0;i<count;i++) {
 		name = 'name' + i;
 		ansys_sub_folder.push(getParameterByName(name));	//add to array
@@ -187,7 +188,7 @@ $(document).ready(function() {
 								if(!bogies) {
 									var cat_nr = iterate_start + itemNo;
 									options.series[cat_nr].data.push(parseFloat(item));
-								} else if(bridge_graph) {
+								} else if(bridge_graph == true) {
 									var cat_nr = iterate_start + itemNo;
 									options.series[cat_nr].data.push(parseFloat(item));
 								} else {
