@@ -72,7 +72,6 @@ $(document).ready(function() {
 		} else {
 			bridge_graph = false;
 		}
-		console.log("file number is " + fileNo + " and bridge_graph is " + bridge_graph);
 		//create options variable
 		var options = {
 			chart: {
@@ -134,6 +133,7 @@ $(document).ready(function() {
 			var iterate_start = 0;
 			//do the following stuff for every file to compare, k is the amount of files, e.g. if comparing name0 and name1 than k = 2
 			for (k=0;k<count;k++) {
+				console.log("file number is " + fileNo + " and bridge_graph is " + bridge_graph);
 				// Iterate over the ansys lines and add categories or series
 				$.each(lines[k], function(lineNo, line) {
 					// first line contains time
