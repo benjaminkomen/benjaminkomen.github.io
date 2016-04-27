@@ -172,10 +172,10 @@ $(document).ready(function() {
 							//put timestep as pointInterval for every input_category
 							options.series[i].pointInterval = timestep;
 						}
-						console.log(input_categories);
 					}
 					// the rest of the lines contain data, put them in series
 					else {
+						console.log(options.series);
 						//exclude last empty line
 						if (line != "") {
 							var items = line.split(',');
@@ -199,7 +199,7 @@ $(document).ready(function() {
 				});
 				iterate_start = options.series.length;
 			}
-			console.log(options.series);
+			//console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 			},
 		"text");
