@@ -151,7 +151,8 @@ $(document).ready(function() {
 						$.each(items, function(itemNo, item) {
 							//check if item exists and not an empty space after the last comma
 							if($.trim(item)) {
-								if(!bogies) {
+								//use the old way if no specific bogie number is defined or if bridge deflection graph is plotted
+								if(!bogies || ansys_sub_folder[k].match(/ub/gi)) {
 									input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
 									console.log("bogies is undefined");
 								} else {
@@ -162,7 +163,6 @@ $(document).ready(function() {
 								}
 							}
 						});
-						console.log(input_categories);
 						//create an object for every input_category in the series array
 						for (i=iterate_start;i<input_categories.length;i++) {
 							options.series.push({
@@ -172,6 +172,7 @@ $(document).ready(function() {
 							//put timestep as pointInterval for every input_category
 							options.series[i].pointInterval = timestep;
 						}
+						console.log(input_categories);
 					}
 					// the rest of the lines contain data, put them in series
 					else {
