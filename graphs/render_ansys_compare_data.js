@@ -49,7 +49,6 @@ $(document).ready(function() {
 	var data_files = {};
 	var data_file = [];
 	var bogies = parseInt(getParameterByName("bogienr"));
-	console.log(bogies);
 	for (i=0;i<count;i++) {
 		name = 'name' + i;
 		ansys_sub_folder.push(getParameterByName(name));	//add to array
@@ -59,7 +58,6 @@ $(document).ready(function() {
 			data_files[i].push(ansys_base_folder + ansys_sub_folder[i] + '/' + j + '.txt');
 		}
 	}
-	console.log(data_files);
 	var ansys_title = ansys_sub_folder.toString();
 	$("h2#title").html('Compare Ansys runs: ' + ansys_title);
 	
@@ -153,9 +151,15 @@ $(document).ready(function() {
 						$.each(items, function(itemNo, item) {
 							//check if item exists and not an empty space after the last comma
 							if($.trim(item)) {
-								input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
-							}
+								if(!bogies) {
+									input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
+								} else {
+									if(itemNo == bogies) {
+										input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
+									}
+								}
 						});
+						console.log(input_categories);
 						//create an object for every input_category in the series array
 						for (i=iterate_start;i<input_categories.length;i++) {
 							options.series.push({
@@ -174,8 +178,15 @@ $(document).ready(function() {
 							$.each(items, function(itemNo, item) {
 							//check if item exists and is a number
 							if(!isNaN(item) && $.trim(item)) {
-								var cat_nr = iterate_start + itemNo;
-								options.series[cat_nr].data.push(parseFloat(item));
+								if(!bogies) {
+									var cat_nr = iterate_start + itemNo;
+									options.series[cat_nr].data.push(parseFloat(item));
+								} else {
+									if(itemNo == bogies) {
+										var cat_nr = iterate_start + itemNo;
+										options.series[cat_nr].data.push(parseFloat(item));
+									}
+								}
 							}
 						});
 						}
