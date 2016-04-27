@@ -158,6 +158,7 @@ $(document).ready(function() {
 										input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
 									}
 								}
+							}
 						});
 						console.log(input_categories);
 						//create an object for every input_category in the series array
