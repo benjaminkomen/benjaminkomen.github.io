@@ -36,8 +36,9 @@ $(document).ready(function() {
 	var url = window.location.href;
 	//var matches = url.match(/[a-z\d]+=[a-z\d]+/gi);
 	var matches = url.match(/name/gi);
+	console.log(matches);
 	var count = matches? matches.length : 0;
-	
+	console.log(count);
 	//define input parameters
 	var ansys_base_folder = 'ansys-data/';
 	var ansys_sub_folder = [];
