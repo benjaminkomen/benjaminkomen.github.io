@@ -10,7 +10,6 @@ $(document).ready(function() {
     url = url.toLowerCase(); // This is just to avoid case sensitiveness
 	if (name !== "" && name !== null && name != undefined) {
 		name = name.replace(/[\[\]]/g, "\\$&").toLowerCase();// This is just to avoid case sensitiveness for query parameter name
-		console.log(name);
 		var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
 			results = regex.exec(url);
 		if (!results) return null;
@@ -49,7 +48,7 @@ $(document).ready(function() {
 	var name;
 	var data_files = {};
 	var data_file = [];
-	var bogies = getParameterByName("bogienr");
+	var bogies = parseInt(getParameterByName("bogienr"));
 	console.log(bogies);
 	for (i=0;i<count;i++) {
 		name = 'name' + i;
