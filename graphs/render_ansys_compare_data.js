@@ -151,17 +151,15 @@ $(document).ready(function() {
 						$.each(items, function(itemNo, item) {
 							//check if item exists and not an empty space after the last comma
 							if($.trim(item)) {
-								console.log("analysing " + ansys_sub_folder[k]);
-								//use the old way if no specific bogie number is defined or if bridge deflection graph is plotted
+								//if no specific bogie number is defined, all bogies should be plotted
 								if(!bogies) {
 									input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
-									console.log("bogies is undefined");
+								//for the bridge deflection graph also all lines should be plotted
 								} else if($.trim(item).match(/ub/gi)) {
-									console.log("we are at bridge deflection graph");
 									input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
+								//now only push the requested bogie number to the input_categories
 								} else {
 									if(itemNo+1 == bogies) {
-										console.log("bogie is defined, pushing item");
 										input_categories.push(ansys_sub_folder[k] + '_' + $.trim(item));
 									}
 								}
@@ -179,11 +177,11 @@ $(document).ready(function() {
 					}
 					// the rest of the lines contain data, put them in series
 					else {
-						console.log(options.series);
 						//exclude last empty line
 						if (line != "") {
 							var items = line.split(',');
 							$.each(items, function(itemNo, item) {
+							console.log("currently looking at series " + options.series.name);
 							//check if item exists and is a number
 							if(!isNaN(item) && $.trim(item)) {
 								if(!bogies) {
@@ -203,7 +201,7 @@ $(document).ready(function() {
 				});
 				iterate_start = options.series.length;
 			}
-			//console.log(options.series);
+			console.log(options.series);
 			var chart = new Highcharts.Chart(options);
 			},
 		"text");
