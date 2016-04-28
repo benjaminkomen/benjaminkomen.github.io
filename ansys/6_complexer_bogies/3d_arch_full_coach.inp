@@ -1,0 +1,696 @@
+!Name:			3d_arch_full_coach
+!Date:			April 22, 2016
+!Last modified: April 25, 2016
+!Description:	3D arch bridge, with full coaches
+
+!******************************************************************
+finish
+/clear
+/prep7
+
+!define some input variables
+!general
+l  			= 154.42				!length bridge [m]
+l_sp		= 11.03					!hanger spacing [m]
+l_tr		= 10.3					!transverse length [m]
+l_l1		= 3.15					!distance to first long girder [m]
+l_l2		= 7.15					!distance to second long girder [m]
+nh			= 13					!number of hangers
+v  			= 125/3.6 	 			!velocity [m/s]
+g  			= 9.81					!gravitational acceleration [m/s2]
+ne 			= 25					!number of elements between hangers
+nn 			= ne + 1				!number of nodes between hangers
+neg			= ((nh+1)*ne)			!number of elements on long girder
+nng 		= neg+1					!number of nodes on long girder
+dl 			= l / neg				!delta length of small element [m]
+dl2			= l_sp / ne				!delta length keypoints long girder [m]
+dt 			= dl / v  				!delta time of one time step [t]
+
+!read all the vehicle data related to input variables
+/input,vehicle_full_coach,inp,,:vars
+
+!steel
+E_st		= 2.1e11				!Youngs modulus [N/m2]
+rho_st		= 7850					!Density steel [kg/m3]
+alph_st		= 12e-6					!Thermal coefficient [1/K]
+mu_st		= 0.3					!Poissons ratio
+
+!arch
+H_arch		= 4.00					!Height arch [m]
+W_arch      = 1.80					!Width arch [m]
+tw_arch		= 18/1000				!Web thickness [m]
+tf_arch     = 44/1000				!Flange thickness [m]
+mod_arch    = 1.43					!mass modification factor
+
+!main girder
+H_mgir		= 1.42					!Height main girder [m]
+W1_mgir	    = 0.200					!Width brim main girder [m]
+W3_mgir		= 1.290					!Width top of the hat main girder [m]
+tb_mgir     = 20/1000				!Brim thickness main girder [m]
+th_mgir     = 36/1000				!Top flange thickness main girder [m]
+tw_mgir     = 26/1000				!Web thickness main girder [m]
+mod_mgir    = 1.70					!mass modification factor
+
+!hanger
+H_hang 		= 0.40					!Height hanger [m]
+W_hang	    = 0.40					!Width hanger [m]
+tw_hang	    = 16/1000				!Web thickness hanger [m]
+tf_hang		= 30/1000				!Flange thickness hanger [m]
+mod_hang    = 0.83					!mass modification factor
+
+!longitudinal girder
+H_lgir		= 1.134					!Height long girder [m]
+W1_lgir	    = 0.400					!Width brim long girder [m]
+W3_lgir		= 1.900					!Width top of the hat long girder [m]
+tb_lgir     = 28/1000				!Brim thickness long girder [m]
+th_lgir     = 24/1000				!Top flange thickness long girder [m]
+tw_lgir     = 14/1000				!Web thickness long girder [m]
+mod_lgir    = 1.98					!mass modification factor
+
+!transverse girder 0
+H_gir0		= 1.773					!Height trans girder 0 [m]
+W1_gir0    	= 0.900					!Width bottom trans girder 0 [m]
+W2_gir0    	= 1.046					!Width top trans girder 0 [m]
+tw_gir0  	= 20/1000				!Web thickness trans girder 0 [m]
+tf1_gir0  	= 32/1000				!Flange bottom thickness trans girder 0 [m]
+tf2_gir0  	= 66/1000				!Flange top thickness trans girder 0 [m]
+
+!transverse girder A
+H_girA		= 1.448					!Height trans girder A [m]
+W1_girA    	= 0.460					!Width bottom trans girder A [m]
+W2_girA    	= 0.694					!Width top trans girder A [m]
+tw_girA  	= 20/1000				!Web thickness trans girder A [m]
+tf1_girA  	= 64/1000				!Flange bottom thickness trans girder A [m]
+tf2_girA  	= 96/1000				!Flange top thickness trans girder A [m]
+
+!transverse girder
+H_tgir		= 1.504					!Height trans girder [m]
+W1_tgir    	= 0.380					!Width bottom trans girder [m]
+W2_tgir    	= 0.360					!Width top trans girder [m]
+tw_tgir  	= 28/1000				!Web thickness trans girder [m]
+tf1_tgir  	= 96/1000				!Flange bottom thickness trans girder [m]
+tf2_tgir  	= 0.108					!Flange top thickness trans girder [m]
+mod_tgir    = 0.79					!mass modification factor
+
+!end portal
+H_por		= 1.212					!Height portal [m]
+W_por       = 1.000					!Width portal [m]
+tw_por		= 20/1000				!Web thickness portal [m]
+tf_por      = 20/1000				!Flange thickness portal [m]
+mod_por     = 1.74					!mass modification factor
+
+!arch bracing
+H_brac		= 0.700					!Height bracing [m]
+W_brac      = 0.380					!Width bracing [m]
+tw_brac     = 17/1000				!Web thickness bracing [m]
+tf_brac     = 32/1000				!Flange thickness bracing [m]
+mod_brac    = 1.22					!mass modification factor
+
+nn_t	= 2*nng+abs(bog_n(%nv%))+1		!array dimension counter
+
+!******************************************************************
+!define the dimension of some output variables
+*dim,t,,nn_t					!time
+
+!bridge
+*dim,ub_mid,,nn_t				!displacement bridge midspan
+*dim,ub_25,,nn_t				!displacement bridge at one quarter
+
+!masses
+*dim,uv,,nn_t,nv				!displacement bogie
+*dim,vv,,nn_t,nv				!velocity bogie
+*dim,av,,nn_t,nv				!acceleration bogie
+*dim,ub,,nn_t,nv				!displacement bridge
+*dim,vb,,nn_t,nv				!velocity bridge
+*dim,ab,,nn_t,nv				!acceleration bridge
+
+!write header info to header arrays for output
+*dim,uv_head,char,1,nv
+*dim,vv_head,char,1,nv
+*dim,av_head,char,1,nv
+*do,i,1,nv
+	uv_head(1,i) = 'uv%i%,'
+	vv_head(1,i) = 'vv%i%,'
+	av_head(1,i) = 'av%i%,'
+*enddo
+
+!******************************************************************
+!define material types
+!steel arch
+mp,  ex,1,E_st
+mp,nuxy,1,mu_st
+mp,dens,1,rho_st*mod_arch
+mp,alpx,1,alph_st
+
+!steel main girder
+mp,  ex,2,E_st
+mp,nuxy,2,mu_st
+mp,dens,2,rho_st*mod_mgir
+mp,alpx,2,alph_st
+
+!steel hanger
+mp,  ex,3,E_st
+mp,nuxy,3,mu_st
+mp,dens,3,rho_st*mod_hang
+mp,alpx,3,alph_st
+
+!steel longitudinal girder
+mp,  ex,6,E_st
+mp,nuxy,6,mu_st
+mp,dens,6,rho_st*mod_lgir
+mp,alpx,6,alph_st
+
+!steel transverse girder 0
+mp,  ex,7,E_st
+mp,nuxy,7,mu_st
+mp,dens,7,rho_st*mod_tgir
+mp,alpx,7,alph_st
+
+!steel transverse girder A
+mp,  ex,8,E_st
+mp,nuxy,8,mu_st
+mp,dens,8,rho_st*mod_tgir
+mp,alpx,8,alph_st
+
+!steel transverse girder
+mp,  ex,9,E_st
+mp,nuxy,9,mu_st
+mp,dens,9,rho_st*mod_tgir
+mp,alpx,9,alph_st
+
+!steel end portal
+mp,  ex,10,E_st
+mp,nuxy,10,mu_st
+mp,dens,10,rho_st*mod_por
+mp,alpx,10,alph_st
+
+!steel arch bracing
+mp,  ex,11,E_st
+mp,nuxy,11,mu_st
+mp,dens,11,rho_st*mod_brac
+mp,alpx,12,alph_st
+
+!******************************************************************
+!define element types and cross sections
+!arch
+et,1,beam188
+sectype,1,beam,hrec			! hollow rectangle
+secdata,W_arch,H_arch,tw_arch,tw_arch,tf_arch,tf_arch
+
+!main girder
+et,2,beam188
+sectype,2,beam,hats			! hat-shaped profile
+secdata,W1_mgir,W1_mgir,W3_mgir,H_mgir,tb_mgir,tb_mgir,th_mgir,tw_mgir,tw_mgir
+
+!hanger
+et,3,beam188
+sectype,3,beam,I			! I-profile
+secdata,W_hang,W_hang,H_hang,tf_hang,tf_hang,tw_hang
+
+/input,vehicle_full_coach,inp,,:etypes
+
+!longitudinal girder
+et,6,beam188
+sectype,6,beam,hats			! hat-shaped profile
+secdata,W1_lgir,W1_lgir,W3_lgir,H_lgir,tb_lgir,tb_lgir,th_lgir,tw_lgir,tw_lgir
+
+!transverse girder 0
+et,7,beam188
+sectype,7,beam,I			! I-profile
+secdata,W1_gir0,W2_gir0,H_gir0,tf1_gir0,tf2_gir0,tw_gir0
+
+!transverse girder A
+et,8,beam188
+sectype,8,beam,I			! I-profile
+secdata,W1_girA,W2_girA,H_girA,tf1_girA,tf2_girA,tw_girA
+
+!transverse girder
+et,9,beam188
+sectype,9,beam,I			! I-profile
+secdata,W1_tgir,W2_tgir,H_tgir,tf1_tgir,tf2_tgir,tw_tgir
+
+!end portal
+et,10,beam188
+sectype,10,beam,hrec			! hollow rectangle
+secdata,W_por,H_por,tw_por,tw_por,tf_por,tf_por
+
+!arch bracings
+et,11,beam188
+sectype,11,beam,I			! I-profile
+secdata,W_brac,W_brac,H_brac,tf_brac,tf_brac,tw_brac
+
+!******************************************************************
+!place keypoints and lines and attach properties
+!west main girder
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+cur_x = 0
+lsel,none
+*do,i,1,nh+1
+	*if,cur_max,eq,0,then
+		k,1,0,0,0
+		cur_max = 1
+	*elseif,i,eq,1,then
+		k,cur_max,0,0,0
+		cur_max = cur_max + 1
+	*elseif,cur_x,le,l_sp,then
+		!mesh first segment finer to have keypoints for trans girder A
+		*do,ii,1,ne
+			cur_max = cur_max + 1
+			k,cur_max,ii*dl2,0,0
+			l,cur_max-1,cur_max
+		*enddo
+	*elseif,cur_x,ge,13*l_sp,then
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*l_sp,0,0
+		l,cur_max-1,cur_max
+		!mesh last segment finer to have keypoints for trans girder A
+		*do,ii,1,ne
+			cur_max = cur_max + 1
+			k,cur_max,cur_x+ii*dl2,0,0
+			l,cur_max-1,cur_max
+		*enddo
+	*else
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*l_sp,0,0
+		l,cur_max-1,cur_max
+	*endif
+	cur_x = cur_x + l_sp
+*enddo
+
+kb2w = cur_max + 1								!define orientation keypoint number
+k,kb2w,0,100,0									!create orientation keypoint
+
+latt,2,,2,,kb2w,,2								!associate selected lines with material 2, element type 2 and sectype 2
+lsel,none
+
+!east main girder
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+cur_x = 0
+*do,i,1,nh+1
+	*if,cur_max,eq,0,then
+		k,1,0,0,l_tr
+		cur_max = 1
+	*elseif,i,eq,1,then
+		cur_max = cur_max + 1
+		k,cur_max,0,0,l_tr
+	*elseif,cur_x,le,l_sp,then
+		!mesh first segment finer to have keypoints for trans girder A
+		*do,ii,1,ne
+			cur_max = cur_max + 1
+			k,cur_max,ii*dl2,0,l_tr
+			l,cur_max-1,cur_max
+		*enddo
+	*elseif,cur_x,ge,13*l_sp,then
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*l_sp,0,l_tr
+		l,cur_max-1,cur_max
+		!mesh last segment finer to have keypoints for trans girder A
+		*do,ii,1,ne
+			cur_max = cur_max + 1
+			k,cur_max,cur_x+ii*dl2,0,l_tr
+			l,cur_max-1,cur_max
+		*enddo
+	*else
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*l_sp,0,l_tr
+		l,cur_max-1,cur_max
+	*endif
+	cur_x = cur_x + l_sp
+*enddo
+
+kb2e = cur_max + 1								!define orientation keypoint number
+k,kb2e,0,100,l_tr								!create orientation keypoint
+
+latt,2,,2,,kb2e,,2								!associate selected lines with material 2, element type 2 and sectype 2
+lsel,none
+
+!west longitudinal girder
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+*do,i,1,nng
+	*if,cur_max,eq,0,then
+		k,1,(i-1)*dl2,0,l_l1
+		cur_max = 2
+	*elseif,i,eq,1,then
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*dl2,0,l_l1
+	*else
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*dl2,0,l_l1
+		l,cur_max-1,cur_max
+	*endif
+*enddo
+
+kb6w = cur_max + 1								!define orientation keypoint number
+k,kb6w,0,100,l_l1								!create orientation keypoint
+
+latt,6,,6,,kb6w,,6
+lsel,none
+
+!east longitudinal girder
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+*do,i,1,nng
+	*if,cur_max,eq,0,then
+		k,1,(i-1)*dl2,0,l_l2
+		cur_max = 2
+	*elseif,i,eq,1,then
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*dl2,0,l_l2
+	*else
+		cur_max = cur_max + 1
+		k,cur_max,(i-1)*dl2,0,l_l2
+		l,cur_max-1,cur_max
+	*endif
+*enddo
+
+kb6e = cur_max + 1								!define orientation keypoint number
+k,kb6e,0,100,l_l2								!create orientation keypoint
+
+latt,6,,6,,kb6e,,6
+lsel,none
+
+!end transverse girders 0
+!left end bridge
+key_01 = kp(0,0,0)
+key_02 = kp(0,0,l_l1)
+key_03 = kp(0,0,l_l2)
+key_04 = kp(0,0,l_tr)
+
+l,key_01,key_02
+l,key_02,key_03
+l,key_03,key_04
+
+latt,7,,7,,kb2e,,7
+lsel,none
+
+!right end bridge
+key_05 = kp(l,0,0)
+key_06 = kp(l,0,l_l1)
+key_07 = kp(l,0,l_l2)
+key_08 = kp(l,0,l_tr)
+
+l,key_05,key_06
+l,key_06,key_07
+l,key_07,key_08
+
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+kb7 = cur_max + 1								!define orientation keypoint number
+k,kb7,l,100,0 									!create orientation keypoint
+
+latt,7,,7,,kb7,,7
+lsel,none
+
+!end transverse girders A
+!left end bridge
+key_A1 = kp(4.469,0,0)
+key_A2 = kp(4.469,0,l_l1)
+key_A3 = kp(4.469,0,l_l2)
+key_A4 = kp(4.469,0,l_tr)
+
+l,key_A1,key_A2
+l,key_A2,key_A3
+l,key_A3,key_A4
+
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+kb8l = cur_max + 1								!define orientation keypoint number
+k,kb8l,4.469,100,0
+
+latt,8,,8,,kb8l,,8
+lsel,none
+
+!right end bridge
+key_A5 = kp(l-4.469,0,0)
+key_A6 = kp(l-4.469,0,l_l1)
+key_A7 = kp(l-4.469,0,l_l2)
+key_A8 = kp(l-4.469,0,l_tr)
+
+l,key_A5,key_A6
+l,key_A6,key_A7
+l,key_A7,key_A8
+
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+kb8r = cur_max + 1								!define orientation keypoint number
+k,kb8r,(l-4.469),100,0
+
+latt,8,,8,,kb8r,,8
+lsel,none
+
+!transverse girders
+*do,i,1,nh
+	cur_x = i*l_sp
+	key_t1 = kp(cur_x,0,0)
+	key_t2 = kp(cur_x,0,l_l1)
+	key_t3 = kp(cur_x,0,l_l2)
+	key_t4 = kp(cur_x,0,l_tr)
+	l,key_t1,key_t2
+	l,key_t2,key_t3
+	l,key_t3,key_t4
+	
+	*get,cur_max,kp,,num,max						!current maximum keypoint number
+	kb9%i% = cur_max + 1							!define orientation keypoint number
+	k,kb9%i%,cur_x,100,0
+	
+	latt,9,,9,,kb9%i%,,9
+	lsel,none
+*enddo
+
+!arch and hangers
+*do,i,1,2*nh+1
+	cur_x = i*0.5*l_sp							!current x position of hanger
+	cur_y = 0.647585*cur_x-0.00419366*cur_x**2	!current y position of hanger
+	*get,maxkey,kp,,num,max						!current maximum keypoint number
+	
+	!arch segments
+	k,maxkey+1,cur_x,cur_y,0					!arch west keypoint
+	k,maxkey+2,cur_x,cur_y,l_tr					!arch east keypoint
+	lsel,none
+	*if,i,eq,1,then
+		l,key_01,maxkey+1						!first arch seg west
+		latt,1,,1,,kb2w,,1
+		lsel,none
+		l,key_04,maxkey+2						!first arch seg east
+		latt,1,,1,,kb2e,,1
+		lsel,none
+	*elseif,i,eq,2*nh+1,then
+		l,maxkey-1,maxkey+1						!arch seg west
+		l,maxkey+1,key_05						!last arch seg west
+		latt,1,,1,,kb7,,1
+		lsel,none
+		l,maxkey,maxkey+2						!arch seg east
+		l,maxkey+2,key_08						!last arch seg east
+		latt,1,,1,,kb2e,,1
+		lsel,none
+	*else
+		l,maxkey-1,maxkey+1						!arch seg west
+		latt,1,,1,,kb2w,,1
+		lsel,none
+		l,maxkey,maxkey+2						!arch seg east
+		latt,1,,1,,kb2e,,1
+		lsel,none
+	*endif
+	lsel,none
+	
+	!hangers on even keypoints
+	mod_i = mod(i,2)							!modulus of i
+	*if,mod_i,eq,0,then
+		key_gir1 = kp(cur_x,0,0)				!keypoint number, bottom of current hanger
+		key_gir2 = kp(cur_x,0,l_tr)
+		l,key_gir1,maxkey+1						!hanger line
+		!latt,3,,3,,,,3							!associate selected lines with material 3, real constant set 3 and element type 3
+		l,key_gir2,maxkey+2
+		latt,3,,3,,,,3
+	*endif
+*enddo
+lsel,none
+
+!end portals
+cur_x = 1.5*l_sp							!x position end portal 1
+cur_y = 0.647585*cur_x-0.00419366*cur_x**2	!y position end portal 1
+
+key_p1 = kp(cur_x,cur_y,0)
+key_p2 = kp(cur_x,cur_y,l_tr)
+l,key_p1,key_p2
+
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+kb10l = cur_max + 1								!define orientation keypoint number
+k,kb10l,cur_x,100,0
+
+latt,10,,10,,kb10l,,10
+lsel,none
+
+key_p3 = kp(l-cur_x,cur_y,0)
+key_p4 = kp(l-cur_x,cur_y,l_tr)
+l,key_p3,key_p4
+
+*get,cur_max,kp,,num,max						!current maximum keypoint number
+kb10r = cur_max + 1								!define orientation keypoint number
+k,kb10r,(l-cur_x),100,0
+
+latt,10,,10,,kb10r,,10
+lsel,none
+
+!arch bracings
+*do,i,1,nh-2
+	cur_x = 1.5*l_sp+i*l_sp
+	cur_y = 0.647585*cur_x-0.00419366*cur_x**2
+	
+	prev_x = cur_x-l_sp
+	prev_y = 0.647585*prev_x-0.00419366*prev_x**2
+	
+	cur_key1 = kp(cur_x,cur_y,0) 
+	cur_key2 = kp(cur_x,cur_y,l_tr)
+	prev_key1 = kp(prev_x,prev_y,0)
+	prev_key2 = kp(prev_x,prev_y,l_tr)
+	
+	l,prev_key1,cur_key2				!bracing west - east
+	
+	*get,cur_max,kp,,num,max						!current maximum keypoint number
+	kb11%i%w = cur_max + 1							!define orientation keypoint number
+	k,kb11%i%w,prev_x,100,0
+	
+	latt,11,,11,,kb11%i%w,,11
+	lsel,none
+	
+	l,prev_key2,cur_key1				!bracing east - west
+	
+	*get,cur_max,kp,,num,max						!current maximum keypoint number
+	kb11%i%e = cur_max + 1							!define orientation keypoint number
+	k,kb11%i%e,prev_x,100,l_tr
+	
+	latt,11,,11,,kb11%i%e,,11
+	lsel,none
+*enddo
+
+lsel,all
+
+!******************************************************************
+!meshing
+!longitudinal girders separate to have fine mesh for train dt
+lsel,s,type,,6			!select all lines of element type 6
+lesize,all,,,1			!number of element divisions per line
+lmesh,all				!generate nodes and line elements along all selected lines
+
+!the rest
+lsel,inve
+lesize,all,3			!number of element divisions per line
+lmesh,all				!generate nodes and line elements along all selected lines
+
+/input,vehicle_full_coach,inp,,:meshing
+
+!******************************************************************
+!DOFs
+!set tolerance to lower value to exactly select nodes
+seltol,1.0e-6
+
+!one support completely constrained
+nsel,s,loc,x,0			!x = 0
+nsel,r,loc,y,0			!y = 0
+nsel,r,loc,z,0			!z = 0
+d,all,ux,,,,,uy,uz
+
+!second support one way constrained
+nsel,s,loc,x,0			!x = 0
+nsel,r,loc,y,0			!y = 0
+nsel,r,loc,z,l_tr		!z = 10.3
+d,all,uy
+
+!third support one way constrained
+nsel,s,loc,x,l			!x = 154.42
+nsel,r,loc,y,0			!y = 0
+nsel,r,loc,z,l_tr		!z = 10.3
+d,all,uy
+
+!fourth support one way constrained
+nsel,s,loc,x,l			!x = 154.42
+nsel,r,loc,y,0			!y = 0
+nsel,r,loc,z,0			!z = 0
+d,all,uy,,,,,uz
+
+allsel
+
+!******************************************************************
+!end of preprocessor, begin static analysis
+finish
+/solu
+antype,trans
+
+!first perform a static load step
+time,dt/1000
+timint,off			!no transient effects
+outres,all,all
+solve
+
+!******************************************************************
+!initial conditions
+t(1) = 0
+
+!bridge
+ub_mid(1)=uy(node(l/2,0,0))
+ub_25(1)=uy(node(l/4,0,0))
+
+/input,vehicle_full_coach,inp,,:initcon
+
+/input,vehicle_full_coach,inp,,:mainrun
+
+!******************************************************************
+!write results to output files
+!bridge deflection
+*cfopen,0,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:defle','ction [m',']'
+(4A)
+*vwrite,'title:br','idge def','lection'
+(3A)
+*vwrite,'ub_mid',',','ub_quart'
+(3A)
+*vwrite,ub_mid(1),',',ub_25(1)
+(3(F20.16,A))
+*cfclose
+
+!bogies deflection
+*cfopen,1,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:verti','cal DOF ','[m]'
+(4A)
+*vwrite,'title:bo','gies ver','tical DO','F'
+(4A)
+*cfclose
+/nopr
+/output,1,txt,,append
+*mwrite,uv_head(1,1)
+(12A)
+*mwrite,uv(1,1),,,,,,,
+(12(F20.16',')F20.16)
+
+!bogies velocity
+*cfopen,2,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:veloc','ity [m/s',']'
+(4A)
+*vwrite,'title:bo','gies vel','ocity'
+(3A)
+*cfclose
+/nopr
+/output,2,txt,,append
+*mwrite,vv_head(1,1)
+(12A)
+*mwrite,vv(1,1),,,,,,,
+(12(F20.16',')F20.16)
+
+!bogies acceleration
+*cfopen,3,txt
+*vwrite,'timestep',':',dt
+(2A,F20.16)
+*vwrite,'yAxisLab','el:accel','eration ','[m/s2]'
+(4A)
+*vwrite,'title:bo','gies acc','eleratio','n'
+(4A)
+*cfclose
+/nopr
+/output,3,txt,,append
+*mwrite,av_head(1,1)
+(12A)
+*mwrite,av(1,1),,,,,,,
+(12(F20.16',')F20.16)

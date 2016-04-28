@@ -1,7 +1,7 @@
-!Name:			2d_arch_sdof_bogies
-!Date:			April 4, 2016
-!Last modified: April 25, 2016
-!Description:	2D arch bridge, with SDOF bogies
+!Name:			2d_arch_2dof_bogies
+!Date:			April 5, 2016
+!Last modified: April 27, 2016
+!Description:	2D arch bridge, with 2DOF bogies
 
 !******************************************************************
 finish
@@ -13,7 +13,7 @@ finish
 l  			= 154.42				!length bridge [m]
 l_sp		= 11.03					!hanger spacing [m]
 nh			= 13					!number of hangers
-v  			= 80/3.6 	 			!velocity [m/s]
+v  			= 300/3.6 	 			!velocity [m/s]
 g  			= 9.81					!gravitational acceleration [m/s2]
 ne 			= 50					!number of elements between hangers
 nn 			= ne + 1				!number of nodes between hangers
@@ -24,7 +24,7 @@ dl2			= l_sp/ne				!delta length keypoints girder [m]
 dt 			= dl/v  				!delta time of one time step [t]
 
 !read all the vehicle data related to input variables
-/input,vehicle_sdof_bogies,inp,,:vars
+/input,vehicle_2dof_bogies,inp,,:vars
 
 !steel
 E_st		= 2.1e11				!Youngs modulus [N/m2]
@@ -111,7 +111,7 @@ r,2,A_girder,I_girder,H_girder
 et,3,beam3
 r,3,A_hanger,I_hanger,H_hanger
 
-/input,vehicle_sdof_bogies,inp,,:etypes
+/input,vehicle_2dof_bogies,inp,,:etypes
 
 !******************************************************************
 !construct bridge: place keypoints and lines and attach properties
@@ -183,7 +183,7 @@ lsel,s,type,,3			!select all lines of element type 3
 lesize,all,3			!number of element divisions per line
 lmesh,all				!generate nodes and line elements along all selected lines
 
-/input,vehicle_sdof_bogies,inp,,:meshing
+/input,vehicle_2dof_bogies,inp,,:meshing
 
 !******************************************************************
 !DOFs
@@ -216,9 +216,9 @@ t(1) = 0
 ub_mid(1)=uy(node(l/2,0,0))
 ub_25(1)=uy(node(l/4,0,0))
 
-/input,vehicle_sdof_bogies,inp,,:initcon
+/input,vehicle_2dof_bogies,inp,,:initcon
 
-/input,vehicle_sdof_bogies,inp,,:mainrun
+/input,vehicle_2dof_bogies,inp,,:mainrun
 !******************************************************************
 !write results to output files
 !bridge deflection
