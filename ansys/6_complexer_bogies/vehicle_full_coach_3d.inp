@@ -99,6 +99,7 @@ r,31,A_co,I_co,H_co
 :meshing							!label
 !******************************************************************
 !meshing
+mat,1
 *do,i,1,nco
 	!coach 1 and 3
 	*if,i,eq,1,or,i,eq,3,then
@@ -212,8 +213,8 @@ r,31,A_co,I_co,H_co
 	e,(10000*(2*i-1)+3),(10000*(2*i-1)+4)	!left beam part
 	e,(10000*(2*i-1)+4),(10000*(2*i)+3)		!right beam part
 	!constrain coach beam
-	d,(10000*(2*i-1)+3),ux,,,,,uz,rotx		!left beam end
-	d,(10000*(2*i)+3),ux,,,,,uz,rotx		!right beam end
+	d,(10000*(2*i-1)+3),ux			!left beam end
+	d,(10000*(2*i)+3),ux			!right beam end
 	!constrain lower mass, all DOF
 	d,(10000*(2*i-1)+1),all					!left wheels mass
 	d,(10000*(2*i)+1),all					!right wheels mass
@@ -256,7 +257,7 @@ timint,on						!include transient effects
 trnopt,,,,,,hht					!use HHT instead of Newmark
 tintp,gamma_d					!damp out numerical noise
 time,dt
-f,path_br(2),fy,-((m_1m+m_2t+m_3t)*g)
+f,path_br(2),fy,-((0.5*m_1m+m_2t+m_3t)*g)
 outres,all,all
 solve
 
@@ -286,9 +287,9 @@ solve
 	*do,i,1,nv
 		!bridge deflection under bogie is bridge node deflection, if bogie is still on beam, else zero (post approach bridge no deflection)
 		*if,bog_n(i),GE,path_br(1),AND,bog_n(i),LE,path_br(nng-1),THEN
-			ub(ii,i)=uy(bog_n(i)+1)
-			vb(ii,i)=vy(bog_n(i)+1)
-			ab(ii,i)=ay(bog_n(i)+1)
+			ub(ii,i)=uy(bog_n(i))
+			vb(ii,i)=vy(bog_n(i))
+			ab(ii,i)=ay(bog_n(i))
 		*else
 			ub(ii,i)=0
 			vb(ii,i)=0
