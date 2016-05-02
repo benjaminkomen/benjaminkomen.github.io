@@ -264,7 +264,7 @@ solve
 :mainrun						!label
 !******************************************************************
 !loop over bridge
-*do,ii,2,0.1*nn_t
+*do,ii,2,nn_t
 	!write data to arrays
 	t(ii)=(ii-1)*dt
 	!bridge
