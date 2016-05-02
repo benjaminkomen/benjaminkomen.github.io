@@ -26,7 +26,7 @@ c_pt		= 64996					!primary damping trailer bogie [Ns/m]
 k_st		= 920000				!secondary stiffnes trailer bogie [N/m]
 c_st		= 75829					!secondary damping trailer bogie [Ns/m]
 
-nv			= 2						!number of bogies
+nv			= 12					!number of bogies
 
 *dim,bog_x,,12						!bogies initial x-coordinate positions array assuming 6 part VIRM
 bog_x(1) 	= 0

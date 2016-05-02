@@ -1,6 +1,6 @@
 !Name:			3d_arch_full_coach
 !Date:			April 22, 2016
-!Last modified: April 25, 2016
+!Last modified: May 2, 2016
 !Description:	3D arch bridge, with full coaches
 
 !******************************************************************
@@ -18,7 +18,7 @@ l_l2		= 7.15					!distance to second long girder [m]
 nh			= 13					!number of hangers
 v  			= 125/3.6 	 			!velocity [m/s]
 g  			= 9.81					!gravitational acceleration [m/s2]
-ne 			= 25					!number of elements between hangers
+ne 			= 50					!number of elements between hangers
 nn 			= ne + 1				!number of nodes between hangers
 neg			= ((nh+1)*ne)			!number of elements on long girder
 nng 		= neg+1					!number of nodes on long girder
@@ -27,7 +27,7 @@ dl2			= l_sp / ne				!delta length keypoints long girder [m]
 dt 			= dl / v  				!delta time of one time step [t]
 
 !read all the vehicle data related to input variables
-/input,vehicle_full_coach,inp,,:vars
+/input,vehicle_full_coach_3d,inp,,:vars
 
 !steel
 E_st		= 2.1e11				!Youngs modulus [N/m2]
@@ -207,7 +207,7 @@ et,3,beam188
 sectype,3,beam,I			! I-profile
 secdata,W_hang,W_hang,H_hang,tf_hang,tf_hang,tw_hang
 
-/input,vehicle_full_coach,inp,,:etypes
+/input,vehicle_full_coach_3d,inp,,:etypes
 
 !longitudinal girder
 et,6,beam188
@@ -574,7 +574,7 @@ lsel,inve
 lesize,all,3			!number of element divisions per line
 lmesh,all				!generate nodes and line elements along all selected lines
 
-/input,vehicle_full_coach,inp,,:meshing
+/input,vehicle_full_coach_3d,inp,,:meshing
 
 !******************************************************************
 !DOFs
@@ -627,9 +627,9 @@ t(1) = 0
 ub_mid(1)=uy(node(l/2,0,0))
 ub_25(1)=uy(node(l/4,0,0))
 
-/input,vehicle_full_coach,inp,,:initcon
+/input,vehicle_full_coach_3d,inp,,:initcon
 
-/input,vehicle_full_coach,inp,,:mainrun
+/input,vehicle_full_coach_3d,inp,,:mainrun
 
 !******************************************************************
 !write results to output files
