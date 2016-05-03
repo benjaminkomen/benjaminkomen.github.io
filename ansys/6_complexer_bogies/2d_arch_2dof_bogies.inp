@@ -145,7 +145,7 @@ key_end = kp(l,0,0)								!get highest keypoint of girder
 	k,maxkey+1,cur_x,cur_y,0					!arch keypoint
 	lsel,none
 	*if,i,eq,1,then
-		key_one = kp(node_one,0,0)
+		key_one = kp(0,0,0)
 		l,key_one,maxkey+1						!first arch segment from start girder to maxkey
 		latt,1,1,1								!associate selected lines with material 1, real constant set 1 and element type 1
 	*elseif,i,eq,nh,then
