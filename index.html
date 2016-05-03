@@ -57,7 +57,7 @@
 		  </thead>
 		  <tbody>
 			<tr>
-			  <th class="mid-header" colspan="6">Simply supported beam with SDOF sprung mass</th>
+			  <th class="mid-header" colspan="6">Simple model 1: Simply supported beam with SDOF sprung mass</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/ansys.html?name=vel_100_nv_1">Ansys</a> + 
@@ -171,7 +171,7 @@
 			  <td>Matlab time histories + fft</td>
 			</tr>
 			<tr>
-			  <th class="mid-header" colspan="6">Simply supported beam with multiple SDOF sprung masses</th>
+			  <th class="mid-header" colspan="6">Simple model 2: Simply supported beam with multiple SDOF sprung masses</th>
 			</tr>
 		    <tr>
 			  <td><a href="graphs/ansys.html?name=vel_100_nv_2_l_25">Ansys</a> + 
@@ -225,10 +225,10 @@
 			  </td>
 			  <td>160</td>
 			  <td>6</td>
-			  <td>1 - 50h*</td>
+			  <td>1 - 50h</td>
 			  <td><a href="ansys/4_2d_arch_bridge/2d_arch_mult_masses.inp">ansys</a></td>
-			  <td>154 meter 2d arch bridge with sprung masses in Ansys.
-			      Note: bridge elements are actually elements between hangers, not total.</td>
+			  <td>154 meter 2d arch bridge with sprung masses in Ansys. Vehicle is not a VIRM train yet but all equal SDOF sprung masses.
+			  </td>
 			</tr>
 			<tr>
 			  <td>numerical differentiated or direct get functions: 
@@ -241,23 +241,7 @@
 			  <td>154 meter 2d arch bridge with sprung mass in Ansys.</td>
 			</tr>
 			<tr>
-			  <td><a href="graphs/ansys.html?name=vel_125_nv_12_ne_50_1dofs">twelve sdofs</a></td>
-			  <td>125</td>
-			  <td>12</td>
-			  <td>50h</td>
-			  <td><a href="ansys/4_2d_arch_bridge/2d_arch_mult_masses.inp">ansys</a></td>
-			  <td>154 meter 2d arch bridge with SDOF sprung masses in Ansys.</td>
-			</tr>
-			<tr>
-			  <td><a href="graphs/ansys.html?name=vel_125_nv_12_ne_50_2dofs">twelve 2dofs</a></td>
-			  <td>125</td>
-			  <td>12</td>
-			  <td>50h</td>
-			  <td><a href="ansys/4_2d_arch_bridge/2d_arch_mult_masses.inp">ansys</a></td>
-			  <td>154 meter 2d arch bridge with 2DOF sprung masses in Ansys.</td>
-			</tr>
-			<tr>
-			  <th class="mid-header" colspan="6">3D Arch bridge with multiple SDOF sprung masses</th>
+			  <th class="mid-header" colspan="6">3D Arch bridge with various train models</th>
 			</tr>
 			 <tr>
 			  <td><a href="graphs/ansys_compare.html?name0=3d_arch_nv_2_1dofs_ne_50&name1=3d_arch_nv_2_2dofs_ne_50&name2=3d_arch_nv_2_full_coach_ne_50">Comparison</a> of<br />
@@ -286,6 +270,21 @@
 			  <td><a href="matlab/fft/fft_script_ansys_input.m">ansys fft</a>
 			  </td>
 			  <td>150 meter 2d arch bridge with 2 bogies or coach.</td>
+			</tr>
+			<tr>
+			  <td><a href="graphs/ansys_compare.html?name0=3d_arch_nv_12_1dofs&name1=3d_arch_nv_12_2dofs&name2=3d_arch_nv_12_full_coach">Comparison</a> of<br />
+					<a href="graphs/ansys.html?name=3d_arch_nv_12_1dofs">twelve 1 DOF bogies</a>, <br />
+					<a href="graphs/ansys.html?name=3d_arch_nv_12_2dofs">twelve 2 DOF bogies</a> and <br />
+					<a href="graphs/ansys.html?name=3d_arch_nv_12_full_coach">six full coaches</a>
+			  </td>
+			  <td>125</td>
+			  <td>12</td>
+			  <td>50h</td>
+			  <td><a href="ansys/6_complexer_bogies/3d_arch_sdof_bogies.inp">1dof</a>, 
+				<a href="ansys/6_complexer_bogies/3d_arch_2dof_bogies.inp">2dof</a> and 
+				<a href="ansys/6_complexer_bogies/3d_arch_full_coach.inp">full coach</a>
+			  </td>
+			  <td>150 meter 3d arch bridge with 12 bogies or 6 full coaches.</td>
 			</tr>
 			<tr>
 			  <th class="mid-header" colspan="6">Kuilenburgse spoorbrug measurements on March 24, 2016</th>
@@ -458,7 +457,7 @@
 		</table>
 	</main>
 	<footer style="height: 50px;">
-		<span style="font-size: smaller;">Page last updated: April 29, 2016</span>
+		<span style="font-size: smaller;">Page last updated: May 3, 2016</span>
 	</footer>
 	</body>
 </html>
