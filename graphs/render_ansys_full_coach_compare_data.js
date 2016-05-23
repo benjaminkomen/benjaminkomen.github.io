@@ -37,7 +37,7 @@ $(document).ready(function() {
 		}
 	}
 	
-	//http://benjaminkomen.github.io/graphs/ansys_full_coach_compare.html?name=3d_arch_nv_12_full_coach_all_dofs&fname0=ad1&fname1=a1i&bogienr=1
+	//http://benjaminkomen.github.io/graphs/ansys_full_coach_compare.html?name=3d_arch_nv_12_full_coach_all_dofs&fname0=ad1&fname1=a1i&coachnr=1
 	//count how many fname parameters in url
 	var url = window.location.href;
 	var matches = url.match(/fname/gi);
@@ -48,7 +48,7 @@ $(document).ready(function() {
 	var data_sub_folder = getParameterByName('name'); //e.g.: 3d_arch_nv_12_full_coach_all_dofs
 	var data_file_names = [];
 	var fname;
-	var bogies = parseInt(getParameterByName("bogienr")); //e.g.: 1 
+	var coach = parseInt(getParameterByName("coachnr")); //e.g.: 1 
 	var data_files = [];
 	for (i=0;i<count;i++) {
 		fname = 'fname' + i;
@@ -147,12 +147,12 @@ $(document).ready(function() {
 					$.each(items, function(itemNo, item) {
 						//check if item exists and not an empty space after the last comma
 						if($.trim(item)) {
-							//if no specific bogie number is defined, all bogies should be plotted
-							if(!bogies) {
+							//if no specific bogie number is defined, all coach should be plotted
+							if(!coach) {
 								input_categories.push($.trim(item));
 							//now only push the requested bogie number to the input_categories
 							} else {
-								if(itemNo+1 == bogies) { //bogies start counting at 1, item numbers at 0
+								if(itemNo+1 == coach) { //coach start counting at 1, item numbers at 0
 									input_categories.push($.trim(item));
 								}
 							}
@@ -176,11 +176,11 @@ $(document).ready(function() {
 						$.each(items, function(itemNo, item) {
 							//check if item exists and is a number
 							if(!isNaN(item) && $.trim(item)) {
-								if(!bogies) {
+								if(!coach) {
 									var cat_nr = iterate_start + itemNo;
 									options.series[cat_nr].data.push(parseFloat(item));
 								} else {
-									if(itemNo+1 == bogies) {
+									if(itemNo+1 == coach) {
 										options.series[k].data.push(parseFloat(item)); //put in k-th series
 									}
 								}
