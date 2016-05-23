@@ -20,6 +20,23 @@ $(document).ready(function() {
 			return arr[arr.length - 1];
 		}
 	}
+	
+		// Array of deferred objects, this function is used later at $.when.all(data_file_get)...
+	if (jQuery.when.all===undefined) {
+		jQuery.when.all = function(deferreds) {
+			var deferred = new jQuery.Deferred();
+			$.when.apply(jQuery, deferreds).then(
+				function() {
+					deferred.resolve(Array.prototype.slice.call(arguments));
+				},
+				function() {
+					deferred.fail(Array.prototype.slice.call(arguments));
+				});
+
+			return deferred;
+		}
+	}
+	
 	//http://benjaminkomen.github.io/graphs/ansys_full_coach_compare.html?name=3d_arch_nv_12_full_coach_all_dofs&fname0=ad1&fname1=a1i&bogienr=1
 	//count how many fname parameters in url
 	var url = window.location.href;
