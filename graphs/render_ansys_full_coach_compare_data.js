@@ -57,143 +57,142 @@ $(document).ready(function() {
 		}
 	$("h2#title").html('Compare Ansys runs in: ' + data_sub_folder);
 	
-	//open first array element, load the rest later in this loop
-	$.each(data_files[0], function(fileNo, data_file) {
-		var container = 'container' + fileNo;
-		console.log(data_file);
-		//create options variable
-		var options = {
-			chart: {
-				renderTo: container,
-				type:'line',
-				zoomType: 'x'
+	//start to process data_files
+	var data_file = data_files[0];
+	var container = 'container0';
+	//create options variable
+	var options = {
+		chart: {
+			renderTo: container,
+			type:'line',
+			zoomType: 'x'
+		},
+		title: {
+			text: ''
+		},
+		subtitle: {
+				text: document.ontouchstart === undefined ?
+						'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+		},
+		tooltip: {
+			positioner: function () {
+				return { x: 80, y: 50 };
 			},
+			valueDecimals: 5,
+			shadow: false,
+			borderWidth: 0,
+			backgroundColor: 'rgba(255,255,255,0.8)'
+		},
+		xAxis: {
+			title: {
+				enabled: true,
+				text: 'Time [s]'
+			},
+			categories: [],
+			startOnTick: true,
+			endOnTick: true,
+			showLastLabel: true
+		},
+		yAxis: {
 			title: {
 				text: ''
-			},
-			subtitle: {
-					text: document.ontouchstart === undefined ?
-							'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
-			},
-			tooltip: {
-				positioner: function () {
-					return { x: 80, y: 50 };
-				},
-				valueDecimals: 5,
-				shadow: false,
-				borderWidth: 0,
-				backgroundColor: 'rgba(255,255,255,0.8)'
-			},
-			xAxis: {
-				title: {
-					enabled: true,
-					text: 'Time [s]'
-				},
-				categories: [],
-				startOnTick: true,
-				endOnTick: true,
-				showLastLabel: true
-			},
-			yAxis: {
-				title: {
-					text: ''
+			}
+		},
+		series : []
+	};
+	
+	//Load any number of extra files
+	var data_file_get = [];
+	for (i=0;i<count;i++) {
+		data_file_get[i] = $.get(data_files[i]);
+	}
+	console.log(data_file_get);
+	//when all data files are loaded, continue
+	$.when.all(data_file_get).done(function(schemas) {
+		// Split the lines
+		var lines = [];
+		//for each data file, extract the lines and split by linebreak
+		$.each(schemas, function(schemaNo, schema) {
+			lines[schemaNo] = schema[0].split('\n');
+		});
+		console.log(lines);
+		//define array with input categories
+		var input_categories = [];
+		var timestep = '';
+		var iterate_start = 0;
+		//do the following stuff for every file to compare, k is the amount of files, e.g. if comparing fname0 and fname1 than k = 2
+		for (k=0;k<count;k++) {
+		// Iterate over the ansys lines and add categories or series
+			$.each(lines[k], function(lineNo, line) {
+				// first line contains time
+				if (lineNo == 0) {
+					var items = line.split(':');
+					//extract timestep from input
+					timestep = +(Math.round(parseFloat($.trim(items[1])) + "e+4")  + "e-4");
 				}
-			},
-			series : []
-		};
-		
-		//Load any number of extra files
-		var data_file_get = [];
-		for (i=0;i<count;i++) {
-			data_file_get[i] = $.get(data_files[i][fileNo]);
-		}
-		console.log(data_file_get);
-		//when all data files are loaded, continue
-		$.when.all(data_file_get).done(function(schemas) {
-			// Split the lines
-			var lines = [];
-			//for each data file, extract the lines and split by linebreak
-			$.each(schemas, function(schemaNo, schema) {
-				lines[schemaNo] = schema[0].split('\n');
-			});			
-			//define array with input categories
-			var input_categories = [];
-			var timestep = '';
-			var iterate_start = 0;
-			//do the following stuff for every file to compare, k is the amount of files, e.g. if comparing fname0 and fname1 than k = 2
-			for (k=0;k<count;k++) {
-			// Iterate over the ansys lines and add categories or series
-				$.each(lines[k], function(lineNo, line) {
-					// first line contains time
-					if (lineNo == 0) {
-						var items = line.split(':');
-						//extract timestep from input
-						timestep = +(Math.round(parseFloat($.trim(items[1])) + "e+4")  + "e-4");
+				// second line contains yAxislabel
+				else if (lineNo == 1) {
+					var items = line.split(':');
+					//extract yAxislabel from input and add to graph
+					options.yAxis.title.text = $.trim(items[1]);
+				}
+				// third line contains graph title
+				else if (lineNo == 2) {
+					var items = line.split(':');
+					//extract graph title from input and add to graph
+					options.title.text = $.trim(items[1]);
+				}
+				// fourth line containes categories, put in input_categories array
+				else if (lineNo == 3) {
+					var items = line.split(',');
+					$.each(items, function(itemNo, item) {
+						//check if item exists and not an empty space after the last comma
+						if($.trim(item)) {
+							//if no specific bogie number is defined, all bogies should be plotted
+							if(!bogies) {
+								input_categories.push($.trim(item));
+							//now only push the requested bogie number to the input_categories
+							} else {
+								if(itemNo+1 == bogies) {
+									input_categories.push($.trim(item));
+								}
+							}
+						}
+					});
+					//create an object for every input_category in the series array
+					for (i=0;i<input_categories.length;i++) {
+						options.series.push({
+							name: input_categories[i],
+							data: []
+						})
+						//put timestep as pointInterval for every input_category
+						options.series[i].pointInterval = timestep;
 					}
-					// second line contains yAxislabel
-					else if (lineNo == 1) {
-						var items = line.split(':');
-						//extract yAxislabel from input and add to graph
-						options.yAxis.title.text = $.trim(items[1]);
-					}
-					// third line contains graph title
-					else if (lineNo == 2) {
-						var items = line.split(':');
-						//extract graph title from input and add to graph
-						options.title.text = $.trim(items[1]);
-					}
-					// fourth line containes categories, put in input_categories array
-					else if (lineNo == 3) {
+				}
+				// the rest of the lines contain data, put them in series
+				else {
+					//exclude last empty line
+					if (line != "") {
 						var items = line.split(',');
 						$.each(items, function(itemNo, item) {
-							//check if item exists and not an empty space after the last comma
-							if($.trim(item)) {
-								//if no specific bogie number is defined, all bogies should be plotted
+							//check if item exists and is a number
+							if(!isNaN(item) && $.trim(item)) {
 								if(!bogies) {
-									input_categories.push($.trim(item));
-								//now only push the requested bogie number to the input_categories
+									options.series[itemNo].data.push(parseFloat(item));
 								} else {
 									if(itemNo+1 == bogies) {
-										input_categories.push($.trim(item));
+										options.series[itemNo].data.push(parseFloat(item));
 									}
 								}
 							}
 						});
-						//create an object for every input_category in the series array
-						for (i=0;i<input_categories.length;i++) {
-							options.series.push({
-								name: input_categories[i],
-								data: []
-							})
-							//put timestep as pointInterval for every input_category
-							options.series[i].pointInterval = timestep;
-						}
 					}
-					// the rest of the lines contain data, put them in series
-					else {
-						//exclude last empty line
-						if (line != "") {
-							var items = line.split(',');
-							$.each(items, function(itemNo, item) {
-								//check if item exists and is a number
-								if(!isNaN(item) && $.trim(item)) {
-									if(!bogies) {
-										options.series[itemNo].data.push(parseFloat(item));
-									} else {
-										if(itemNo+1 == bogies) {
-											options.series[itemNo].data.push(parseFloat(item));
-										}
-									}
-								}
-							});
-						}
-					}
-				});
-				iterate_start = options.series.length;
-			}
-			console.log(options.series);
-			var chart = new Highcharts.Chart(options);
-			},
-		"text");
-	});
+				}
+			});
+			iterate_start = options.series.length;
+		}
+		console.log(options.series);
+		var chart = new Highcharts.Chart(options);
+		},
+	"text");
 });
