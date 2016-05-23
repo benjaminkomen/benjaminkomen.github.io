@@ -159,7 +159,7 @@ $(document).ready(function() {
 						}
 					});
 					//create an object for every input_category in the series array
-					for (i=0;i<input_categories.length;i++) {
+					for (i=iterate_start;i<input_categories.length;i++) {
 						options.series.push({
 							name: input_categories[i],
 							data: []
