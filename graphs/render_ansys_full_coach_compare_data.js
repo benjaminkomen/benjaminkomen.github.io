@@ -167,7 +167,6 @@ $(document).ready(function() {
 						//put timestep as pointInterval for every input_category
 						options.series[i].pointInterval = timestep;
 					}
-					console.log('input categories: ' + input_categories);
 				}
 				// the rest of the lines contain data, put them in series
 				else {
@@ -191,6 +190,7 @@ $(document).ready(function() {
 			});
 			iterate_start = options.series.length;
 		}
+		console.log(input_categories);
 		console.log(options.series);
 		var chart = new Highcharts.Chart(options);
 		},
