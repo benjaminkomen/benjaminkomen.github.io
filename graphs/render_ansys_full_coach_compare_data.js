@@ -55,6 +55,7 @@ $(document).ready(function() {
 		data_file_names.push(getParameterByName(fname));	//e.g.: ad1
 		data_files.push(data_base_folder + data_sub_folder + '/' + data_file_names[i] + '.txt'); //array with full links of text files
 		}
+	data_file_names_string = data_file_names.toString();
 	$("h2#title").html('Compare Ansys runs in: ' + data_sub_folder);
 	
 	//start to process data_files
@@ -68,7 +69,7 @@ $(document).ready(function() {
 			zoomType: 'x'
 		},
 		title: {
-			text: ''
+			text: 'Degrees of Freedom ' + data_file_names_string
 		},
 		subtitle: {
 				text: document.ontouchstart === undefined ?
@@ -95,7 +96,7 @@ $(document).ready(function() {
 		},
 		yAxis: {
 			title: {
-				text: ''
+				text: 'acceleration [m/s2]'
 			}
 		},
 		series : []
@@ -132,13 +133,13 @@ $(document).ready(function() {
 				else if (lineNo == 1) {
 					var items = line.split(':');
 					//extract yAxislabel from input and add to graph
-					options.yAxis.title.text = $.trim(items[1]);
+					//options.yAxis.title.text = $.trim(items[1]);
 				}
 				// third line contains graph title
 				else if (lineNo == 2) {
 					var items = line.split(':');
 					//extract graph title from input and add to graph
-					options.title.text = $.trim(items[1]);
+					//options.title.text = $.trim(items[1]);
 				}
 				// fourth line containes categories, put in input_categories array
 				else if (lineNo == 3) {
