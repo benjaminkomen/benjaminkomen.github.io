@@ -144,7 +144,6 @@ $(document).ready(function() {
 				else if (lineNo == 3) {
 					var items = line.split(',');
 					$.each(items, function(itemNo, item) {
-						console.log('item number: ' + itemNo + ' and item: ' + item)
 						//check if item exists and not an empty space after the last comma
 						if($.trim(item)) {
 							//if no specific bogie number is defined, all bogies should be plotted
@@ -177,10 +176,11 @@ $(document).ready(function() {
 							//check if item exists and is a number
 							if(!isNaN(item) && $.trim(item)) {
 								if(!bogies) {
-									options.series[itemNo].data.push(parseFloat(item));
+									var cat_nr = iterate_start + itemNo;
+									options.series[cat_nr].data.push(parseFloat(item));
 								} else {
 									if(itemNo+1 == bogies) {
-										options.series[itemNo].data.push(parseFloat(item));
+										options.series[k].data.push(parseFloat(item)); //put in k-th series
 									}
 								}
 							}
@@ -190,7 +190,6 @@ $(document).ready(function() {
 			});
 			iterate_start = options.series.length;
 		}
-		console.log(input_categories);
 		console.log(options.series);
 		var chart = new Highcharts.Chart(options);
 		},
