@@ -6,21 +6,27 @@
 $(document).ready(function() {
 	//define function to read url parameters
 	function getParameterByName(name, url) {
-    if (!url) url = window.location.href;
-    url = url.toLowerCase(); // This is just to avoid case sensitiveness  
-    name = name.replace(/[\[\]]/g, "\\$&").toLowerCase();// This is just to avoid case sensitiveness for query parameter name
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-}	
+		if (!url) url = window.location.href;
+		url = url.toLowerCase(); // This is just to avoid case sensitiveness
+		if (name !== "" && name !== null && name != undefined) {
+			name = name.replace(/[\[\]]/g, "\\$&").toLowerCase();// This is just to avoid case sensitiveness for query parameter name
+			var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+				results = regex.exec(url);
+			if (!results) return null;
+			if (!results[2]) return '';
+			return decodeURIComponent(results[2].replace(/\+/g, " "));
+		} else {
+			var arr = location.href.split("/");
+			return arr[arr.length - 1];
+		}
+	}
+	
 	//location of data files
 	var data_base_folder = 'ansys-data/';
 	var data_sub_folder = getParameterByName('name');
 	$("h2#title").html('Folder: ' + data_sub_folder);
 	var data_files = [];
-	var file_names = ['a1i', 'a2i', 'ad1', 'ad2', 'af1', 'af2', 'am', 'ar'];
+	var file_names = ['af1', 'ad1', 'a1i', 'am', 'ar', 'af2', 'ad2', 'a2i'];
 	$.each(file_names, function(fileNo, file_name) {
 		data_files.push(data_base_folder + data_sub_folder + '/' + file_name + '.txt');
 	});
