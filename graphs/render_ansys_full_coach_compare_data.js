@@ -106,7 +106,6 @@ $(document).ready(function() {
 	for (i=0;i<count;i++) {
 		data_file_get[i] = $.get(data_files[i]);
 	}
-	console.log(data_file_get);
 	//when all data files are loaded, continue
 	$.when.all(data_file_get).done(function(schemas) {
 		// Split the lines
@@ -115,7 +114,6 @@ $(document).ready(function() {
 		$.each(schemas, function(schemaNo, schema) {
 			lines[schemaNo] = schema[0].split('\n');
 		});
-		console.log(lines);
 		//define array with input categories
 		var input_categories = [];
 		var timestep = '';
@@ -146,6 +144,7 @@ $(document).ready(function() {
 				else if (lineNo == 3) {
 					var items = line.split(',');
 					$.each(items, function(itemNo, item) {
+						console.log('item number: ' + itemNo + ' and item: ' + item)
 						//check if item exists and not an empty space after the last comma
 						if($.trim(item)) {
 							//if no specific bogie number is defined, all bogies should be plotted
@@ -153,7 +152,7 @@ $(document).ready(function() {
 								input_categories.push($.trim(item));
 							//now only push the requested bogie number to the input_categories
 							} else {
-								if(itemNo+1 == bogies) {
+								if(itemNo+1 == bogies) { //bogies start counting at 1, item numbers at 0
 									input_categories.push($.trim(item));
 								}
 							}
@@ -168,6 +167,7 @@ $(document).ready(function() {
 						//put timestep as pointInterval for every input_category
 						options.series[i].pointInterval = timestep;
 					}
+					console.log('input categories: ' + input_categories);
 				}
 				// the rest of the lines contain data, put them in series
 				else {
