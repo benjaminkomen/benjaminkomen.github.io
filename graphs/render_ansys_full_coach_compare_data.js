@@ -53,16 +53,14 @@ $(document).ready(function() {
 	for (i=0;i<count;i++) {
 		fname = 'fname' + i;
 		data_file_names.push(getParameterByName(fname));	//e.g.: ad1
-		data_files.push(data_base_folder + data_sub_folder + '/' + data_file_names[i] + '.txt');
+		data_files.push(data_base_folder + data_sub_folder + '/' + data_file_names[i] + '.txt'); //array with full links of text files
 		}
-	$("h2#title").html('Folder: ' + data_sub_folder);
+	$("h2#title").html('Compare Ansys runs in: ' + data_sub_folder);
 	
-	//loop through data files and preprocess data to plot graph
-	$.each(data_files, function(fileNo, data_file) {
-		var options = 'options' + fileNo;
+	//open first array element, load the rest later in this loop
+	$.each(data_files[0], function(fileNo, data_file) {
 		var container = 'container' + fileNo;
-		var chart = 'chart' + fileNo;
-		
+		console.log(data_file);
 		//create options variable
 		var options = {
 			chart: {
@@ -109,7 +107,7 @@ $(document).ready(function() {
 		for (i=0;i<count;i++) {
 			data_file_get[i] = $.get(data_files[i][fileNo]);
 		}
-		
+		console.log(data_file_get);
 		//when all data files are loaded, continue
 		$.when.all(data_file_get).done(function(schemas) {
 			// Split the lines
@@ -117,13 +115,12 @@ $(document).ready(function() {
 			//for each data file, extract the lines and split by linebreak
 			$.each(schemas, function(schemaNo, schema) {
 				lines[schemaNo] = schema[0].split('\n');
-			});
-			
+			});			
 			//define array with input categories
 			var input_categories = [];
 			var timestep = '';
 			var iterate_start = 0;
-			//do the following stuff for every file to compare, k is the amount of files, e.g. if comparing name0 and name1 than k = 2
+			//do the following stuff for every file to compare, k is the amount of files, e.g. if comparing fname0 and fname1 than k = 2
 			for (k=0;k<count;k++) {
 			// Iterate over the ansys lines and add categories or series
 				$.each(lines[k], function(lineNo, line) {

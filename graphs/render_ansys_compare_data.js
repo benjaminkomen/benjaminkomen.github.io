@@ -6,22 +6,22 @@
 $(document).ready(function() {
 	//define function to read url parameters
 	function getParameterByName(name, url) {
-    if (!url) url = window.location.href;
-    url = url.toLowerCase(); // This is just to avoid case sensitiveness
-	if (name !== "" && name !== null && name != undefined) {
-		name = name.replace(/[\[\]]/g, "\\$&").toLowerCase();// This is just to avoid case sensitiveness for query parameter name
-		var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-			results = regex.exec(url);
-		if (!results) return null;
-		if (!results[2]) return '';
-		return decodeURIComponent(results[2].replace(/\+/g, " "));
-	} else {
-        var arr = location.href.split("/");
-        return arr[arr.length - 1];
-    }
+		if (!url) url = window.location.href;
+		url = url.toLowerCase(); // This is just to avoid case sensitiveness
+		if (name !== "" && name !== null && name != undefined) {
+			name = name.replace(/[\[\]]/g, "\\$&").toLowerCase();// This is just to avoid case sensitiveness for query parameter name
+			var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+				results = regex.exec(url);
+			if (!results) return null;
+			if (!results[2]) return '';
+			return decodeURIComponent(results[2].replace(/\+/g, " "));
+		} else {
+			var arr = location.href.split("/");
+			return arr[arr.length - 1];
+		}
 	}
 
-	// Array of deferred objects
+	// Array of deferred objects, this function is used later at $.when.all(data_file_get)...
 	if (jQuery.when.all===undefined) {
 		jQuery.when.all = function(deferreds) {
 			var deferred = new jQuery.Deferred();
@@ -61,8 +61,7 @@ $(document).ready(function() {
 	}
 	var ansys_title = ansys_sub_folder.toString();
 	$("h2#title").html('Compare Ansys runs: ' + ansys_title);
-	
-	
+		
 	//loop through ansys data files and preprocess data to plot graph
 	$.each(data_files[0], function(fileNo, data_file0) {
 		var container = 'container' + fileNo;
