@@ -123,7 +123,15 @@ $(document).ready(function() {
 					$.each(items, function(itemNo, item) {
 						//check if item exists and not an empty space after the last comma
 						if($.trim(item)) {
-							input_categories.push($.trim(item));
+							//if no specific bogie number is defined, all bogies should be plotted
+							if(!bogies) {
+								input_categories.push($.trim(item));
+							//now only push the requested bogie number to the input_categories
+							} else {
+								if(itemNo+1 == bogies) {
+									input_categories.push($.trim(item));
+								}
+							}
 						}
 					});
 					//create an object for every input_category in the series array
@@ -143,7 +151,15 @@ $(document).ready(function() {
 						var items = line.split(',');
 						$.each(items, function(itemNo, item) {
 							//check if item exists and is a number
-							if(!isNaN(item) && $.trim(item)) {options.series[itemNo].data.push(parseFloat(item)); }
+							if(!isNaN(item) && $.trim(item)) {
+								if(!bogies) {
+									options.series[itemNo].data.push(parseFloat(item));
+								} else {
+									if(itemNo+1 == bogies) {
+										options.series[itemNo].data.push(parseFloat(item));
+									}
+								}
+							}
 						});
 					}
 				}
