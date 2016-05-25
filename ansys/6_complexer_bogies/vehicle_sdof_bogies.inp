@@ -1,6 +1,6 @@
 !Name:			vehicle_sdof_bogies
 !Date:			April 18, 2016
-!Last modified: April 25, 2016
+!Last modified: May 10, 2016
 !Description:	vehicle model of SDOF bogies
 
 :vars								!label
@@ -196,8 +196,8 @@ solve
 	!bogies
 	*do,i,1,nv
 		uv(ii,i)=uy(10000*i+3)
-		vv(ii,i)=vy(10000*i+3)
-		av(ii,i)=ay(10000*i+3)
+		vv(ii,i)=(uv(ii,i)-uv(ii-1,i))/dt
+		av(ii,i)=(vv(ii,i)-vv(ii-1,i))/dt
 		
 		!bridge deflection under bogie is bridge node deflection, if bogie is still on beam, else zero (post approach bridge no deflection)
 		*if,bog_n(i),GE,path_br(1),AND,bog_n(i),LE,path_br(nng-1),THEN

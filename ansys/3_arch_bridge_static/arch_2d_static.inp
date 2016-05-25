@@ -1,7 +1,7 @@
-!Name:			arch_hanger_beam
+!Name:			arch_2d_static
 !Date:			March 1, 2016
-!Last modified: March 4, 2016
-!Description:	Ansys model of arch beam, with hangers as beam/link elements
+!Last modified: May 17, 2016
+!Description:	Ansys model of 2d arch bridge
 
 !******************************************************************
 finish
@@ -13,9 +13,9 @@ finish
 l  			= 154.42				!length bridge [m]
 l_sp		= 11.03					!hanger spacing [m]
 nh			= 13					!number of hangers
-v  			= 27.78	 	 			!velocity [m/s]
+v  			= 100/3.6 	 			!velocity [m/s]
 g  			= 9.81					!gravitational acceleration [m/s2]
-ne 			= 25					!number of elements between hangers
+ne 			= 50					!number of elements between hangers
 nn 			= ne + 1				!number of nodes between hangers
 ng 			= ((nh+1)*ne)+1			!number of nodes on girder
 dl 			= l / ne				!delta length of small element
@@ -32,13 +32,13 @@ mu_st		= 0.3					!Poissons ratio
 A_arch		= 0.598					!Cross sectional area [m2]
 I_arch		= 1.599					!Moment of inertia arch [m4]
 H_arch		= 4.00					!Height arch [m]
-alph_a 		= 1.577					!mass modification factor
+mod_arch    = 1.577					!mass modification factor
 
 !equivalent girder
 A_girder	= 0.447					!Cross sectional area [m2]
 I_girder	= 0.107					!Moment of inertia arch [m4]
 H_girder	= 1.42					!Height arch [m]
-alph_g 		= 2.101					!mass modification factor
+mod_gir		= 2.101					!mass modification factor
 
 !equivalent hanger
 A_hanger	= 0.059					!Cross sectional area [m2]
@@ -52,13 +52,13 @@ nn_t		= nn+1					!array dimension counter
 !steel arch
 mp,  ex,1,E_st
 mp,nuxy,1,mu_st
-mp,dens,1,alph_a*rho_st
+mp,dens,1,mod_arch*rho_st
 mp,alpx,1,alph_st
 
 !steel girder
 mp,  ex,2,E_st
 mp,nuxy,2,mu_st
-mp,dens,2,alph_g*rho_st
+mp,dens,2,mod_gir*rho_st
 mp,alpx,2,alph_st
 
 !steel hanger
@@ -80,10 +80,6 @@ r,2,A_girder,I_girder,H_girder
 !hanger as beam
 et,3,beam3
 r,3,A_hanger,I_hanger,H_hanger
-
-!hanger as link
-!et,3,link8
-!r,3,A_hanger
 
 !******************************************************************
 !place keypoints and lines and attach properties
@@ -112,19 +108,17 @@ lsel,none
 		l,1,maxkey								!first arch segment from keypoint 1 to maxkey
 		latt,1,1,1								!associate selected lines with material 1, real constant set 1 and element type 1
 	*elseif,i,eq,nh,then
-		l,maxkey-2,maxkey
+		l,maxkey-1,maxkey
 		l,maxkey,key_end						!last arch segment from keypoint to key_end
 		latt,1,1,1
 	*else
-		l,maxkey-2,maxkey						!other arch segments, fromline from previous keypoint to current
+		l,maxkey-1,maxkey						!other arch segments, from previous keypoint to current
 		latt,1,1,1
 	*endif
 	lsel,none
-	kb1 = maxkey + 1							!define orientation keypoint number
-	k,kb1,cur_x,0,10								!create orientation keypoint
 	key_gir = kp(cur_x,0,0)						!keypoint number, bottom of current hanger
 	l,key_gir,maxkey							!hanger line
-	latt,3,3,3,,kb1								!associate selected lines with material 1, real constant set 3 and element type 3
+	latt,3,3,3									!associate selected lines with material 1, real constant set 3 and element type 3
 *enddo
 
 lsel,all
@@ -138,13 +132,12 @@ lmesh,all				!generate nodes and line elements along all selected lines
 
 !arch
 lsel,s,type,,1			!select all lines of element type 1
-lesize,all,,,(ne/3)		!number of element divisions per line
+lesize,all,3			!number of element divisions per line
 lmesh,all				!generate nodes and line elements along all selected lines
 
 !hangers
 lsel,s,type,,3			!select all lines of element type 3
-lesize,all,,,(ne/3)		!more possible with beam3 element
-!lesize,all,,,1			!only one for link8 element
+lesize,all,3			!number of element divisions per line
 lmesh,all				!generate nodes and line elements along all selected lines
 
 !******************************************************************
@@ -166,6 +159,12 @@ finish
 antype,stat
 
 !******************************************************************
+!self weight of all elements
+acel,,9.8
+
+solve
+
+!******************************************************************
 !full loading over girder
 esel,s,type,,2
 sfbeam,all,,pres,90000,90000	!distributed load on girder
@@ -178,10 +177,10 @@ esel,r,cent,x,0,(l/2)		!only select left half
 sfbeam,all,,pres,90000,90000
 allsel
 
-!esel,s,type,,2
-!esel,r,cent,x,(l/2),l		!only select right half
-!sfbeam,all,,pres,-90000,-90000
-!allsel
+esel,s,type,,2
+esel,r,cent,x,(l/2),l		!only select right half
+sfbeam,all,,pres,-90000,-90000
+allsel
 
 solve
 

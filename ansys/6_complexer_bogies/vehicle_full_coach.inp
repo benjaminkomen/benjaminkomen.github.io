@@ -1,6 +1,6 @@
 !Name:			vehicle_full_coach
 !Date:			April 18, 2016
-!Last modified: May 2, 2016
+!Last modified: May 9, 2016
 !Description:	vehicle model of full coach
 
 :vars								!label
@@ -212,8 +212,8 @@ r,31,A_co,I_co,H_co
 	e,(10000*(2*i-1)+3),(10000*(2*i-1)+4)	!left beam part
 	e,(10000*(2*i-1)+4),(10000*(2*i)+3)		!right beam part
 	!constrain coach beam
-	d,(10000*(2*i-1)+3),ux					!left beam end
-	d,(10000*(2*i)+3),ux					!right beam end
+	!d,(10000*(2*i-1)+3),ux					!left beam end
+	!d,(10000*(2*i)+3),ux					!right beam end
 	!constrain lower mass, all DOF
 	d,(10000*(2*i-1)+1),all					!left wheels mass
 	d,(10000*(2*i)+1),all					!right wheels mass
@@ -275,12 +275,12 @@ solve
 	*do,i,1,nco
 		!left bogie
 		uv(ii,(2*i-1))=uy(10000*(2*i-1)+3)
-		vv(ii,(2*i-1))=vy(10000*(2*i-1)+3)
-		av(ii,(2*i-1))=ay(10000*(2*i-1)+3)
+		vv(ii,(2*i-1))=(uv(ii,(2*i-1))-uv(ii-1,(2*i-1)))/dt
+		av(ii,(2*i-1))=(vv(ii,(2*i-1))-vv(ii-1,(2*i-1)))/dt
 		!right bogie
 		uv(ii,(2*i))=uy(10000*(2*i)+3)
-		vv(ii,(2*i))=vy(10000*(2*i)+3)
-		av(ii,(2*i))=ay(10000*(2*i)+3)
+		vv(ii,(2*i))=(uv(ii,(2*i))-uv(ii-1,(2*i)))/dt
+		av(ii,(2*i))=(vv(ii,(2*i))-vv(ii-1,(2*i)))/dt
 	*enddo
 	
 	*do,i,1,nv

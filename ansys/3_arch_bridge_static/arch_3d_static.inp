@@ -1,7 +1,7 @@
-!Name:			3d_arch_sdof_bogies
-!Date:			April 22, 2016
-!Last modified: April 25, 2016
-!Description:	3D arch bridge, with SDOF bogies
+!Name:			3d_arch_bracings
+!Date:			May 9, 2016
+!Last modified: May 18, 2016
+!Description:	3D arch bridge with bottom wind bracings
 
 !******************************************************************
 finish
@@ -18,16 +18,13 @@ l_l2		= 7.15					!distance to second long girder [m]
 nh			= 13					!number of hangers
 v  			= 125/3.6 	 			!velocity [m/s]
 g  			= 9.81					!gravitational acceleration [m/s2]
-ne 			= 50					!number of elements between hangers
+ne 			= 25					!number of elements between hangers
 nn 			= ne + 1				!number of nodes between hangers
 neg			= ((nh+1)*ne)			!number of elements on long girder
 nng 		= neg+1					!number of nodes on long girder
 dl 			= l / neg				!delta length of small element [m]
 dl2			= l_sp / ne				!delta length keypoints long girder [m]
 dt 			= dl / v  				!delta time of one time step [t]
-
-!read all the vehicle data related to input variables
-/input,vehicle_sdof_bogies,inp,,:vars
 
 !steel
 E_st		= 2.1e11				!Youngs modulus [N/m2]
@@ -49,7 +46,7 @@ W3_mgir		= 1.290					!Width top of the hat main girder [m]
 tb_mgir     = 20/1000				!Brim thickness main girder [m]
 th_mgir     = 36/1000				!Top flange thickness main girder [m]
 tw_mgir     = 26/1000				!Web thickness main girder [m]
-mod_mgir    = 1.70					!mass modification factor
+mod_mgir    = 1.58					!mass modification factor
 
 !hanger
 H_hang 		= 0.40					!Height hanger [m]
@@ -106,33 +103,11 @@ tw_brac     = 17/1000				!Web thickness bracing [m]
 tf_brac     = 32/1000				!Flange thickness bracing [m]
 mod_brac    = 1.22					!mass modification factor
 
-nn_t	= 2*nng+abs(bog_n(%nv%))+1		!array dimension counter
+!bottom bracing
+A_bot		= 9.1e-3				!Area bottom bracing [m2]
+mod_bot     = 1.17					!mass modification factor
 
-!******************************************************************
-!define the dimension of some output variables
-*dim,t,,nn_t					!time
-
-!bridge
-*dim,ub_mid,,nn_t				!displacement bridge midspan
-*dim,ub_25,,nn_t				!displacement bridge at one quarter
-
-!masses
-*dim,uv,,nn_t,nv				!displacement bogie
-*dim,vv,,nn_t,nv				!velocity bogie
-*dim,av,,nn_t,nv				!acceleration bogie
-*dim,ub,,nn_t,nv				!displacement bridge
-*dim,vb,,nn_t,nv				!velocity bridge
-*dim,ab,,nn_t,nv				!acceleration bridge
-
-!write header info to header arrays for output
-*dim,uv_head,char,1,nv
-*dim,vv_head,char,1,nv
-*dim,av_head,char,1,nv
-*do,i,1,nv
-	uv_head(1,i) = 'uv%i%,'
-	vv_head(1,i) = 'vv%i%,'
-	av_head(1,i) = 'av%i%,'
-*enddo
+nn_t		= nn+1					!array dimension counter
 
 !******************************************************************
 !define material types
@@ -188,7 +163,13 @@ mp,alpx,10,alph_st
 mp,  ex,11,E_st
 mp,nuxy,11,mu_st
 mp,dens,11,rho_st*mod_brac
-mp,alpx,12,alph_st
+mp,alpx,11,alph_st
+
+!steel bottom bracing
+mp,  ex,14,E_st
+mp,nuxy,14,mu_st
+mp,dens,14,rho_st*mod_bot
+mp,alpx,14,alph_st
 
 !******************************************************************
 !define element types and cross sections
@@ -206,8 +187,6 @@ secdata,W1_mgir,W1_mgir,W3_mgir,H_mgir,tb_mgir,tb_mgir,th_mgir,tw_mgir,tw_mgir
 et,3,beam188
 sectype,3,beam,I			! I-profile
 secdata,W_hang,W_hang,H_hang,tf_hang,tf_hang,tw_hang
-
-/input,vehicle_sdof_bogies,inp,,:etypes
 
 !longitudinal girder
 et,6,beam188
@@ -238,6 +217,10 @@ secdata,W_por,H_por,tw_por,tw_por,tf_por,tf_por
 et,11,beam188
 sectype,11,beam,I			! I-profile
 secdata,W_brac,W_brac,H_brac,tf_brac,tf_brac,tw_brac
+
+!bottom bracings
+et,14,link8
+r,41,A_bot
 
 !******************************************************************
 !place keypoints and lines and attach properties
@@ -406,8 +389,12 @@ key_A2 = kp(4.469,0,l_l1)
 key_A3 = kp(4.469,0,l_l2)
 key_A4 = kp(4.469,0,l_tr)
 
+kbetw,key_A2,key_A3
+key_Am1 = kp(4.469,0,(l_tr/2))
+
 l,key_A1,key_A2
-l,key_A2,key_A3
+l,key_A2,key_Am1
+l,key_Am1,key_A3
 l,key_A3,key_A4
 
 *get,cur_max,kp,,num,max						!current maximum keypoint number
@@ -423,8 +410,12 @@ key_A6 = kp(l-4.469,0,l_l1)
 key_A7 = kp(l-4.469,0,l_l2)
 key_A8 = kp(l-4.469,0,l_tr)
 
+kbetw,key_A6,key_A7
+key_Am2 = kp(l-4.469,0,(l_tr/2))
+
 l,key_A5,key_A6
-l,key_A6,key_A7
+l,key_A6,key_Am2
+l,key_Am2,key_A7
 l,key_A7,key_A8
 
 *get,cur_max,kp,,num,max						!current maximum keypoint number
@@ -434,23 +425,61 @@ k,kb8r,(l-4.469),100,0
 latt,8,,8,,kb8r,,8
 lsel,none
 
-!transverse girders
-*do,i,1,nh
+!bottom bracings at beginning and end of bridge
+!bottom bracings
+!define some existing keypoints
+key_b1 = kp(l_sp,0,0)
+key_b4 = kp(l_sp,0,l_tr)
+key_b5 = kp(l-l_sp,0,0)
+key_b8 = kp(l-l_sp,0,l_tr)
+
+!make lines between keypoints
+l,key_01,key_Am1
+l,key_Am1,key_b4
+l,key_04,key_Am1
+l,key_Am1,key_b1
+
+l,key_05,key_Am2
+l,key_Am2,key_b8
+l,key_08,key_Am2
+l,key_Am2,key_b5
+
+latt,14,41,14										!mat 14, real const 41, elem type 14
+lsel,none
+
+!transverse girders and bottom bracings
+*do,i,1,nh+1
 	cur_x = i*l_sp
 	key_t1 = kp(cur_x,0,0)
 	key_t2 = kp(cur_x,0,l_l1)
 	key_t3 = kp(cur_x,0,l_l2)
 	key_t4 = kp(cur_x,0,l_tr)
-	l,key_t1,key_t2
-	l,key_t2,key_t3
-	l,key_t3,key_t4
+	!only execute the transverse girders part for 0<i<14
+	*if,i,le,nh,then
+		!transverse girders
+		l,key_t1,key_t2
+		l,key_t2,key_t3
+		l,key_t3,key_t4
+		
+		*get,cur_max,kp,,num,max						!current maximum keypoint number
+		kb9%i% = cur_max + 1							!define orientation keypoint number
+		k,kb9%i%,cur_x,100,0
+		
+		latt,9,,9,,kb9%i%,,9
+		lsel,none
+	*endif
 	
-	*get,cur_max,kp,,num,max						!current maximum keypoint number
-	kb9%i% = cur_max + 1							!define orientation keypoint number
-	k,kb9%i%,cur_x,100,0
-	
-	latt,9,,9,,kb9%i%,,9
-	lsel,none
+	!normal bracings in the middle part
+	*if,i,gt,1,and,i,le,nh,then
+		!bottom bracings
+		key_t1i = kp((cur_x-l_sp),0,0)
+		key_t4i = kp((cur_x-l_sp),0,l_tr)
+		l,key_t1i,key_t4
+		l,key_t1,key_t4i
+		
+		latt,14,41,14										!mat 14, real const 41, elem type 14
+		lsel,none
+	*endif
 *enddo
 
 !arch and hangers
@@ -566,6 +595,7 @@ lsel,all
 !meshing
 !longitudinal girders separate to have fine mesh for train dt
 lsel,s,type,,6			!select all lines of element type 6
+lsel,a,type,,14			!also bottom bracings are link8 and should be meshed as one
 lesize,all,,,1			!number of element divisions per line
 lmesh,all				!generate nodes and line elements along all selected lines
 
@@ -573,8 +603,6 @@ lmesh,all				!generate nodes and line elements along all selected lines
 lsel,inve
 lesize,all,3			!number of element divisions per line
 lmesh,all				!generate nodes and line elements along all selected lines
-
-/input,vehicle_sdof_bogies,inp,,:meshing
 
 !******************************************************************
 !DOFs
@@ -611,85 +639,57 @@ allsel
 !end of preprocessor, begin static analysis
 finish
 /solu
-antype,trans
 
-!first perform a static load step
-time,dt/1000
-timint,off			!no transient effects
-outres,all,all
+antype,stat
+
+!******************************************************************
+!self weight of all elements
+acel,,9.8
+
 solve
 
 !******************************************************************
-!initial conditions
-t(1) = 0
+!full loading over girder
+esel,s,type,,6
+!esel,a,type,,2
+sfbeam,all,1,pres,90000/2,90000/2	!distributed load on girder, face 2 is in -y normal direction
+allsel
 
-!bridge
-ub_mid(1)=uy(node(l/2,0,0))
-ub_25(1)=uy(node(l/4,0,0))
+solve
 
-/input,vehicle_sdof_bogies,inp,,:initcon
-
-/input,vehicle_sdof_bogies,inp,,:mainrun
 !******************************************************************
-!write results to output files
-!bridge deflection
-*cfopen,0,txt
-*vwrite,'timestep',':',dt
-(2A,F20.16)
-*vwrite,'yAxisLab','el:defle','ction [m',']'
-(4A)
-*vwrite,'title:br','idge def','lection'
-(3A)
-*vwrite,'ub_mid',',','ub_quart'
-(3A)
-*vwrite,ub_mid(1),',',ub_25(1)
-(3(F20.16,A))
-*cfclose
+!anti symmetric loading over girder
+esel,s,type,,6
+esel,r,cent,x,0,(l/2)		!only select left half
+sfbeam,all,1,pres,90000/2,90000/2
+allsel
 
-!bogies deflection
-*cfopen,1,txt
-*vwrite,'timestep',':',dt
-(2A,F20.16)
-*vwrite,'yAxisLab','el:verti','cal DOF ','[m]'
-(4A)
-*vwrite,'title:bo','gies ver','tical DO','F'
-(4A)
-*cfclose
-/nopr
-/output,1,txt,,append
-*mwrite,uv_head(1,1)
-(12A)
-*mwrite,uv(1,1),,,,,,,
-(12(F20.16',')F20.16)
+esel,s,type,,6
+esel,r,cent,x,(l/2),l		!only select right half
+sfbeam,all,1,pres,-90000/2,-90000/2
+allsel
 
-!bogies velocity
-*cfopen,2,txt
-*vwrite,'timestep',':',dt
-(2A,F20.16)
-*vwrite,'yAxisLab','el:veloc','ity [m/s',']'
-(4A)
-*vwrite,'title:bo','gies vel','ocity'
-(3A)
-*cfclose
-/nopr
-/output,2,txt,,append
-*mwrite,vv_head(1,1)
-(12A)
-*mwrite,vv(1,1),,,,,,,
-(12(F20.16',')F20.16)
+solve
 
-!bogies acceleration
-*cfopen,3,txt
-*vwrite,'timestep',':',dt
-(2A,F20.16)
-*vwrite,'yAxisLab','el:accel','eration ','[m/s2]'
-(4A)
-*vwrite,'title:bo','gies acc','eleratio','n'
-(4A)
-*cfclose
-/nopr
-/output,3,txt,,append
-*mwrite,av_head(1,1)
-(12A)
-*mwrite,av(1,1),,,,,,,
-(12(F20.16',')F20.16)
+!******************************************************************
+!begin modal analysis
+finish
+/solu
+antype,modal
+modopt,subsp,200,,,
+eqslv,front
+mxpand,200,,,
+solve
+
+finish
+/post1
+set,list
+
+!******************************************************************
+!post processing
+finish
+/post1
+
+nc = node(l/4,0,0)
+nsel,node,nc
+prnsol,dof

@@ -1,7 +1,7 @@
-!Name:			vehicle_full_coach
+!Name:			vehicle_full_coach_3d_new
 !Date:			April 18, 2016
-!Last modified: May 9, 2016
-!Description:	vehicle model of full coach
+!Last modified: May 20, 2016
+!Description:	vehicle model of full coach, with full coach DOFs output
 
 :vars								!label
 !******************************************************************
@@ -240,9 +240,39 @@ mat,1
 	ub(1,(2*i))=0
 	vb(1,(2*i))=0
 	ab(1,(2*i))=0
+	
+	!coaches
+	uco_uf1(ii,i)=0
+	uco_ud1(ii,i)=0
+	uco_u1i(ii,i)=0
+	uco_um(ii,i)=0
+	uco_ur(ii,i)=0
+	uco_uf2(ii,i)=0
+	uco_ud2(ii,i)=0
+	uco_u2i(ii,i)=0
+	
+	!coaches
+	vco_vf1(ii,i)=0
+	vco_vd1(ii,i)=0
+	vco_v1i(ii,i)=0
+	vco_vm(ii,i)=0
+	vco_vr(ii,i)=0
+	vco_vf2(ii,i)=0
+	vco_vd2(ii,i)=0
+	vco_v2i(ii,i)=0
+		
+	!coaches
+	aco_af1(1,i)=0
+	aco_ad1(1,i)=0
+	aco_a1i(1,i)=0
+	aco_am(1,i)=0
+	aco_ar(1,i)=0
+	aco_af2(1,i)=0
+	aco_ad2(1,i)=0
+	aco_a2i(1,i)=0
 *enddo
 
-!determine node numbers on vehicle path_br, backwards compatible with 2d bridge
+!determine node numbers on vehicle path_br
 *dim,path_br,,nng
 cur_x = 0
 *do,i,1,nng
@@ -265,7 +295,7 @@ solve
 :mainrun						!label
 !******************************************************************
 !loop over bridge
-*do,ii,2,0.25*nn_t
+*do,ii,2,nn_t
 	!write data to arrays
 	t(ii)=(ii-1)*dt
 	!bridge
@@ -282,6 +312,36 @@ solve
 		uv(ii,(2*i))=uy(10000*(2*i)+3)
 		vv(ii,(2*i))=(uv(ii,(2*i))-uv(ii-1,(2*i)))/dt
 		av(ii,(2*i))=(vv(ii,(2*i))-vv(ii-1,(2*i)))/dt
+		
+		!coaches
+		uco_uf1(ii,i) = uy(10000*(2*i-1)+2)
+		uco_ud1(ii,i) = uy(10000*(2*i-1)+3)
+		uco_um(ii,i)  = uy(10000*(2*i-1)+4)
+		uco_ur(ii,i)  = rotz(10000*(2*i-1)+4)
+		uco_uf2(ii,i) = uy(10000*(2*i)+2)
+		uco_ud2(ii,i) = uy(10000*(2*i)+3)
+		uco_u1i(ii,i) = uco_um(ii,i) - uco_ur(ii,i)*10
+		uco_u2i(ii,i) = uco_um(ii,i) + uco_ur(ii,i)*10
+		
+		!coaches
+		vco_vf1(ii,i) = (uco_uf1(ii,i)-uco_uf1(ii-1,i))/dt
+		vco_vd1(ii,i) = (uco_ud1(ii,i)-uco_ud1(ii-1,i))/dt
+		vco_vm(ii,i)  = (uco_um(ii,i)-uco_um(ii-1,i))/dt
+		vco_vr(ii,i)  = (uco_ur(ii,i)-uco_ur(ii-1,i))/dt
+		vco_vf2(ii,i) = (uco_uf2(ii,i)-uco_uf2(ii-1,i))/dt
+		vco_vd2(ii,i) = (uco_ud2(ii,i)-uco_ud2(ii-1,i))/dt
+		vco_v1i(ii,i) = (uco_u1i(ii,i)-uco_u1i(ii-1,i))/dt
+		vco_v2i(ii,i) = (uco_u2i(ii,i)-uco_u2i(ii-1,i))/dt
+		
+		!coaches
+		aco_af1(ii,i) = (vco_vf1(ii,i)-vco_vf1(ii-1,i))/dt
+		aco_ad1(ii,i) = (vco_vd1(ii,i)-vco_vd1(ii-1,i))/dt
+		aco_am(ii,i)  = (vco_vm(ii,i)-vco_vm(ii-1,i))/dt
+		aco_ar(ii,i)  = (vco_vr(ii,i)-vco_vr(ii-1,i))/dt
+		aco_af2(ii,i) = (vco_vf2(ii,i)-vco_vf2(ii-1,i))/dt
+		aco_ad2(ii,i) = (vco_vd2(ii,i)-vco_vd2(ii-1,i))/dt 
+		aco_a1i(ii,i) = (vco_v1i(ii,i)-vco_v1i(ii-1,i))/dt
+		aco_a2i(ii,i) = (vco_v2i(ii,i)-vco_v2i(ii-1,i))/dt 
 	*enddo
 	
 	*do,i,1,nv
