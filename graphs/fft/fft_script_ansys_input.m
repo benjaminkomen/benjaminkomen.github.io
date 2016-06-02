@@ -10,7 +10,7 @@ clc;
 % read data into array using third-party script
 file_name	= '3';
 file_ext	= '.txt';
-file_path	= '../ansys-data/3d_arch_nv_2_1dofs_ne_50/';
+file_path	= '../ansys-data/3d_arch_nv_12_1dofs_bd/';
 input_path	= strcat(file_path, file_name, file_ext);
 [data_array,ffn,nh,SR,hl]	= txt2mat(input_path);
 
