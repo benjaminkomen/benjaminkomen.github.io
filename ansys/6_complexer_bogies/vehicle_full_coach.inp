@@ -1,6 +1,6 @@
 !Name:			vehicle_full_coach
 !Date:			April 18, 2016
-!Last modified: May 9, 2016
+!Last modified: May 27, 2016
 !Description:	vehicle model of full coach
 
 :vars								!label
@@ -88,8 +88,8 @@ r,24,k_st,c_st			!trailer bogie secondary suspension
 
 !mass coach
 et,12,mass21,,,3
-r,11,m_1m				!motor coach mass
-r,14,m_1t				!trailer coach mass
+r,11,m_1m,I_m			!motor coach mass
+r,14,m_1t,I_t			!trailer coach mass
 
 !coach beam
 et,13,beam3
@@ -105,26 +105,26 @@ r,31,A_co,I_co,H_co
 		!place masses
 		type,4
 		real,16
-		n,(10000*(2*i-1)+1),abs(bog_x(2*i-1)),30	!wheels mass left
+		n,(10000*(2*i-1)+1),bog_x(2*i-1)+150,40	!wheels mass left
 		e,(10000*(2*i-1)+1)
 		real,13
-		n,(10000*(2*i)+1),abs(bog_x(2*i)),30	!wheels mass right
+		n,(10000*(2*i)+1),bog_x(2*i)+150,40	!wheels mass right
 		e,(10000*(2*i)+1)
 		real,15
-		n,(10000*(2*i-1)+2),abs(bog_x(2*i-1)),30.5	!frame mass left
+		n,(10000*(2*i-1)+2),bog_x(2*i-1)+150,40.5	!frame mass left
 		e,(10000*(2*i-1)+2)
 		real,12
-		n,(10000*(2*i)+2),abs(bog_x(2*i)),30.5	!frame mass right
+		n,(10000*(2*i)+2),bog_x(2*i)+150,40.5	!frame mass right
 		e,(10000*(2*i)+2)
 		real,17
-		n,(10000*(2*i-1)+3),abs(bog_x(2*i-1)),31	!dummy mass left
+		n,(10000*(2*i-1)+3),bog_x(2*i-1)+150,41	!dummy mass left
 		e,(10000*(2*i-1)+3)
-		n,(10000*(2*i)+3),abs(bog_x(2*i)),31	!dummy mass right
+		n,(10000*(2*i)+3),bog_x(2*i)+150,41	!dummy mass right
 		e,(10000*(2*i)+3)
 		type,12
 		real,11
-		xpos = ((abs(bog_x(2*i))+abs(bog_x(2*i-1)))/2)
-		n,(10000*(2*i-1)+4),xpos,31				!coach mass
+		xpos = ((bog_x(2*i)+bog_x(2*i-1))/2)+150
+		n,(10000*(2*i-1)+4),xpos,41				!coach mass
 		e,(10000*(2*i-1)+4)
 		!place spring-dampers
 		type,5
@@ -141,26 +141,26 @@ r,31,A_co,I_co,H_co
 		!place masses
 		type,4
 		real,13
-		n,(10000*(2*i-1)+1),abs(bog_x(2*i-1)),30	!wheels mass left
+		n,(10000*(2*i-1)+1),bog_x(2*i-1)+150,40	!wheels mass left
 		e,(10000*(2*i-1)+1)
 		real,16
-		n,(10000*(2*i)+1),abs(bog_x(2*i)),30	!wheels mass right
+		n,(10000*(2*i)+1),bog_x(2*i)+150,40	!wheels mass right
 		e,(10000*(2*i)+1)
 		real,12
-		n,(10000*(2*i-1)+2),abs(bog_x(2*i-1)),30.5	!frame mass left
+		n,(10000*(2*i-1)+2),bog_x(2*i-1)+150,40.5	!frame mass left
 		e,(10000*(2*i-1)+2)
 		real,15
-		n,(10000*(2*i)+2),abs(bog_x(2*i)),30.5	!frame mass right
+		n,(10000*(2*i)+2),bog_x(2*i)+150,40.5	!frame mass right
 		e,(10000*(2*i)+2)
 		real,17
-		n,(10000*(2*i-1)+3),abs(bog_x(2*i-1)),31	!dummy mass left
+		n,(10000*(2*i-1)+3),bog_x(2*i-1)+150,41	!dummy mass left
 		e,(10000*(2*i-1)+3)
-		n,(10000*(2*i)+3),abs(bog_x(2*i)),31	!dummy mass right
+		n,(10000*(2*i)+3),bog_x(2*i)+150,41	!dummy mass right
 		e,(10000*(2*i)+3)
 		type,12
 		real,11
-		xpos = ((abs(bog_x(2*i))+abs(bog_x(2*i-1)))/2)
-		n,(10000*(2*i-1)+4),xpos,31				!coach mass
+		xpos = ((bog_x(2*i)+bog_x(2*i-1))/2)+150
+		n,(10000*(2*i-1)+4),xpos,41				!coach mass
 		e,(10000*(2*i-1)+4)
 		!place spring-dampers
 		type,5
@@ -177,24 +177,24 @@ r,31,A_co,I_co,H_co
 		!place masses
 		type,4
 		real,16
-		n,(10000*(2*i-1)+1),abs(bog_x(2*i-1)),30	!wheels mass left
+		n,(10000*(2*i-1)+1),bog_x(2*i-1)+150,40	!wheels mass left
 		e,(10000*(2*i-1)+1)
-		n,(10000*(2*i)+1),abs(bog_x(2*i)),30	!wheels mass right
+		n,(10000*(2*i)+1),bog_x(2*i)+150,40	!wheels mass right
 		e,(10000*(2*i)+1)
 		real,15
-		n,(10000*(2*i-1)+2),abs(bog_x(2*i-1)),30.5	!frame mass left
+		n,(10000*(2*i-1)+2),bog_x(2*i-1)+150,40.5	!frame mass left
 		e,(10000*(2*i-1)+2)
-		n,(10000*(2*i)+2),abs(bog_x(2*i)),30.5	!frame mass right
+		n,(10000*(2*i)+2),bog_x(2*i)+150,40.5	!frame mass right
 		e,(10000*(2*i)+2)
 		real,17
-		n,(10000*(2*i-1)+3),abs(bog_x(2*i-1)),31	!dummy mass left
+		n,(10000*(2*i-1)+3),bog_x(2*i-1)+150,41	!dummy mass left
 		e,(10000*(2*i-1)+3)
-		n,(10000*(2*i)+3),abs(bog_x(2*i)),31	!dummy mass right
+		n,(10000*(2*i)+3),bog_x(2*i)+150,41	!dummy mass right
 		e,(10000*(2*i)+3)
 		type,12
 		real,14
-		xpos = ((abs(bog_x(2*i))+abs(bog_x(2*i-1)))/2)
-		n,(10000*(2*i-1)+4),xpos,31				!coach mass
+		xpos = ((bog_x(2*i)+bog_x(2*i-1))/2)+150
+		n,(10000*(2*i-1)+4),xpos,41				!coach mass
 		e,(10000*(2*i-1)+4)
 		!place spring-dampers
 		type,5
