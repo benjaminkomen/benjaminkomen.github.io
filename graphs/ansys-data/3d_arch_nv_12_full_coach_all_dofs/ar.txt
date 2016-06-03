@@ -1,5 +1,5 @@
 timestep:         0.0063532800000000
-yAxisLabel:acceleration ar [m/s2]       
+yAxisLabel:acceleration ar [rad/s2]       
 title:acceleration ar   
 co1_ar, co2_ar, co3_ar, co4_ar, co5_ar, co6_ar, 
 co1_af2,co2_af2,co3_af2,co4_af2,co5_af2,co6_af2,
