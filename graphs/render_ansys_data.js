@@ -1,7 +1,7 @@
 /* Name:			render_ansys_data
- * Date: 			
- * Last modified:	April 1, 2016
- * Description:		Make four graphs of ansys output data 0, 1, 2 and 3.txt
+ * Date: 			April 1, 2016
+ * Last modified:	June 7, 2016
+ * Description:		Make four graphs of ansys output data 0, 1, 2 and 3.txt, or other file if requested
  */
 $(document).ready(function() {
 	//define function to read url parameters
@@ -18,10 +18,16 @@ $(document).ready(function() {
 	//location of data files
 	var data_base_folder = 'ansys-data/';
 	var data_sub_folder = getParameterByName('name');
-	$("h2#title").html('Folder: ' + data_sub_folder);
+	var data_file_name = getParameterByName('file');
 	var data_files = [];
-	for (i=0;i<4;i++) {
-		data_files.push(data_base_folder + data_sub_folder + '/' + i + '.txt');
+	if(!data_file_name) { //there was no parameter provided, use old method of plotting 0,1,2,3
+		$("h2#title").html('Folder: ' + data_sub_folder);
+		for (i=0;i<4;i++) {
+			data_files.push(data_base_folder + data_sub_folder + '/' + i + '.txt');
+		}
+	} else { //there IS a filename provided, use it
+		$("h2#title").html('Folder: ' + data_sub_folder + ' file: ' + data_file_name);
+		data_files.push(data_base_folder + data_sub_folder + '/' + data_file_name + '.txt');
 	}
 	
 	//loop through data files and preprocess data to plot graph
