@@ -199,6 +199,7 @@ $(document).ready(function() {
 					}
 					// the rest of the lines contain data, put them in series
 					else {
+						console.log(options.series);
 						//exclude last empty line
 						if (line != "") {
 							var items = line.split(',');
