@@ -211,7 +211,7 @@ $(document).ready(function() {
 									var cat_nr = iterate_start + itemNo;
 									options.series[cat_nr].data.push(parseFloat(item));
 								//if we are reading file 0.txt, it is a bridge deflection graph
-								} else if(fileNo == 0) {
+								} else if(fileNo == 0 && count2 <= 0) {
 									var cat_nr = iterate_start + itemNo;
 									console.log('cat_nr is: ' + cat_nr);
 									options.series[cat_nr].data.push(parseFloat(item));
