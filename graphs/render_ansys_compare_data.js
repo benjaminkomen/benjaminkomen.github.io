@@ -45,8 +45,6 @@ $(document).ready(function() {
 	var matches2 = url2.match(/file/gi);
 	var count2 = matches2? matches2.length : 0;
 	
-	console.log('counting url parameters results in name: ' + count + ' and file: ' + count2);
-	
 	//define input parameters
 	var ansys_base_folder = 'ansys-data/';
 	var ansys_sub_folder = [];
@@ -129,6 +127,7 @@ $(document).ready(function() {
 	
 		//Load any number of ansys data files
 		var data_file_get = [];
+		console.log('count is: ' + count);
 		for (i=0;i<count;i++) {
 			data_file_get[i] = $.get(data_files[i][fileNo]);
 		}
