@@ -145,7 +145,6 @@ $(document).ready(function() {
 			var iterate_start = 0;
 			//do the following stuff for every file to compare, k is the amount of files, e.g. if comparing name0 and name1 than k = 2
 			for (k=0;k<count;k++) {
-				console.log('count is: ' + count + ' and k is: ' + k);
 				// Iterate over the ansys lines and add categories or series
 				$.each(lines[k], function(lineNo, line) {
 					// first line contains time
@@ -186,7 +185,6 @@ $(document).ready(function() {
 								}
 							}
 						});
-						console.log('k is: ' + k + ' and Im pushing to input_categories: ' + input_categories);
 						//create an object for every input_category in the series array
 						for (i=iterate_start;i<input_categories.length;i++) {
 							options.series.push({
@@ -199,7 +197,6 @@ $(document).ready(function() {
 					}
 					// the rest of the lines contain data, put them in series
 					else {
-						console.log(options.series);
 						//exclude last empty line
 						if (line != "") {
 							var items = line.split(',');
@@ -213,7 +210,6 @@ $(document).ready(function() {
 								//if we are reading file 0.txt, it is a bridge deflection graph
 								} else if(fileNo == 0 && count2 <= 0) {
 									var cat_nr = iterate_start + itemNo;
-									console.log('cat_nr is: ' + cat_nr);
 									options.series[cat_nr].data.push(parseFloat(item));
 								} else {
 									if(itemNo+1 == bogies) {
