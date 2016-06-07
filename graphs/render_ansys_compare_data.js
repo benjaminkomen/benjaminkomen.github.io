@@ -206,11 +206,14 @@ $(document).ready(function() {
 							$.each(items, function(itemNo, item) {
 							//check if item exists and is a number
 							if(!isNaN(item) && $.trim(item)) {
+								//if no specific bogie number is defined, all bogies should be plotted
 								if(!bogies) {
 									var cat_nr = iterate_start + itemNo;
 									options.series[cat_nr].data.push(parseFloat(item));
+								//if we are reading file 0.txt, it is a bridge deflection graph
 								} else if(fileNo == 0) {
 									var cat_nr = iterate_start + itemNo;
+									console.log('cat_nr is: ' + cat_nr);
 									options.series[cat_nr].data.push(parseFloat(item));
 								} else {
 									if(itemNo+1 == bogies) {
