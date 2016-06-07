@@ -127,7 +127,6 @@ $(document).ready(function() {
 	
 		//Load any number of ansys data files
 		var data_file_get = [];
-		console.log('count is: ' + count);
 		for (i=0;i<count;i++) {
 			data_file_get[i] = $.get(data_files[i][fileNo]);
 		}
@@ -146,6 +145,7 @@ $(document).ready(function() {
 			var iterate_start = 0;
 			//do the following stuff for every file to compare, k is the amount of files, e.g. if comparing name0 and name1 than k = 2
 			for (k=0;k<count;k++) {
+				console.log('count is: ' + count + ' and k is: ' + k);
 				// Iterate over the ansys lines and add categories or series
 				$.each(lines[k], function(lineNo, line) {
 					// first line contains time
