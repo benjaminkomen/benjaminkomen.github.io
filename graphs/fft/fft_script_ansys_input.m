@@ -8,9 +8,9 @@ clear all;
 clc;
 
 % read data into array using third-party script
-file_name	= 'ar';
+file_name	= 'ab';
 file_ext	= '.txt';
-file_path	= '../ansys-data/3d_arch_nv_12_full_coach_all_dofs/';
+file_path	= '../ansys-data/3d_arch_nv_12_full_coach_all_dofs_ab/';
 input_path	= strcat(file_path, file_name, file_ext);
 [data_array,ffn,nh,SR,hl]	= txt2mat(input_path);
 
