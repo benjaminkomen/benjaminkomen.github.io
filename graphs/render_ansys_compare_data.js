@@ -40,8 +40,9 @@ $(document).ready(function() {
 	//count how many name and file parameters in url
 	var url = window.location.href;
 	var matches = url.match(/name/gi);
-	var matches2 = url.match(/file/gi);
 	var count = matches? matches.length : 0;
+	var url2 = window.location.href;
+	var matches2 = url2.match(/file/gi);
 	var count2 = matches2? matches2.length : 0;
 	
 	//define input parameters
