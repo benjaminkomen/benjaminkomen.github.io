@@ -71,7 +71,6 @@ $(document).ready(function() {
 			}
 		}
 	}
-	console.log(data_files);
 	var ansys_title = ansys_sub_folder.toString();
 	$("h2#title").html('Compare Ansys runs: ' + ansys_title);
 		
@@ -185,6 +184,7 @@ $(document).ready(function() {
 								}
 							}
 						});
+						console.log(input_categories);
 						//create an object for every input_category in the series array
 						for (i=iterate_start;i<input_categories.length;i++) {
 							options.series.push({
