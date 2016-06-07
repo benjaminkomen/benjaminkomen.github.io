@@ -1,6 +1,6 @@
 /* Name:			render_ansys_compare_data
  * Date: 			April 15, 2016
- * Last modified:	April 27, 2016
+ * Last modified:	June 7, 2016
  * Description:		Make 4 graphs with comparison between multiple ansys datasets
  */
 $(document).ready(function() {
@@ -37,15 +37,19 @@ $(document).ready(function() {
 		}
 	}
 	
-	//count how many name parameters in url
+	//count how many name and file parameters in url
 	var url = window.location.href;
 	var matches = url.match(/name/gi);
+	var matches2 = url.match(/file/gi);
 	var count = matches? matches.length : 0;
+	var count2 = matches2? matches2.length : 0;
 	
 	//define input parameters
 	var ansys_base_folder = 'ansys-data/';
 	var ansys_sub_folder = [];
+	var ansys_data_file_name = [];
 	var name;
+	var file;
 	var data_files = {};
 	var data_file = [];
 	var bogies = parseInt(getParameterByName("bogienr"));
@@ -55,10 +59,19 @@ $(document).ready(function() {
 		ansys_sub_folder.push(getParameterByName(name));	//add to array
 		data_files[i] = [];
 		data_file.push('data_file' + i);
-		for (j=0;j<4;j++) {
-			data_files[i].push(ansys_base_folder + ansys_sub_folder[i] + '/' + j + '.txt');
+		if(count2 <= 0) { //no file names given in url, assume viewer wants to see files: 0,1,2,3
+			for (j=0;j<4;j++) {
+				data_files[i].push(ansys_base_folder + ansys_sub_folder[i] + '/' + j + '.txt');
+			}
+		} else { //filenames are provided, use them
+			for (j=0;j<count2;j++) {
+				file = 'file' + j;
+				ansys_data_file_name.push(getParameterByName(file));	//add to array
+				data_files[i].push(ansys_base_folder + ansys_sub_folder[i] + '/' + ansys_data_file_name[j] + '.txt');
+			}
 		}
 	}
+	console.log(data_files);
 	var ansys_title = ansys_sub_folder.toString();
 	$("h2#title").html('Compare Ansys runs: ' + ansys_title);
 		
