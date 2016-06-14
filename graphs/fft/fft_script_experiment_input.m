@@ -8,9 +8,9 @@ clear all;
 clc;
 
 % read data into array using third-party script
-file_name	= 'full';
+file_name	= 'trip_8_cut';
 file_ext	= '.txt';
-file_path	= '../experiment-data/trip_4_alt/';
+file_path	= '../experiment-data/bridge/';
 input_path	= strcat(file_path, file_name, file_ext);
 data_array	= txt2mat(input_path);
 
