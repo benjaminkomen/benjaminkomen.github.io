@@ -1,6 +1,6 @@
 !Name:			vehicle_full_coach
 !Date:			April 18, 2016
-!Last modified: May 27, 2016
+!Last modified: June 3, 2016
 !Description:	vehicle model of full coach
 
 :vars								!label
@@ -24,16 +24,24 @@ rho_co		= 1e-8					!density coach [kg/m3]
 m_2m		= 8620					!motor frame mass [kg]
 m_3m		= 2*1200				!two motor wheelsets mass [kg]
 k_pm		= 5000000				!primary stiffness motor bogie [N/m]
-c_pm		= 103804				!primary damping motor bogie [Ns/m]
+c_crpm		= 2*(k_pm*m_2m)**0.5    !critical primary motor bogie damping [Ns/m]
+c_pm		= 0.25*c_crpm			!primary damping motor bogie [Ns/m]
+!c_pm		= 103804				!primary damping motor bogie [Ns/m]
 k_sm		= 920000				!secondary stiffness motor bogie [N/m]
-c_sm		= 81670					!secondary damping motor bogie [Ns/m]
+c_crsm		= 2*(k_sm*m_1m)**0.5	!critical secondary motor bogie damping [Ns/m]
+c_sm		= 0.25*c_crsm			!secondary damping motor bogie [Ns/m]
+!c_sm		= 81670					!secondary damping motor bogie [Ns/m]
 !trailer bogie
 m_2t		= 4970					!trailer frame mass [kg]
 m_3t		= 2*1700				!two trailer wheelsets mass [kg]
 k_pt		= 3400000				!primary stiffnes trailer bogie [N/m]
-c_pt		= 64996					!primary damping trailer bogie [Ns/m]
+c_crpt		= 2*(k_pt*m_2t)**0.5    !critical primary trailer bogie damping [Ns/m]
+c_pt		= 0.25*c_crpt			!primary damping trailer bogie [Ns/m]
+!c_pt		= 64996					!primary damping trailer bogie [Ns/m]
 k_st		= 920000				!secondary stiffnes trailer bogie [N/m]
-c_st		= 75829					!secondary damping trailer bogie [Ns/m]
+c_crst		= 2*(k_st*m_1t)**0.5	!critical secondary trailer bogie damping [Ns/m]
+c_st		= 0.25*c_crst			!secondary damping trailer bogie [Ns/m]
+!c_st		= 75829					!secondary damping trailer bogie [Ns/m]
 
 nv			= 12					!number of bogies
 nco			= nv/2					!number of coaches
